@@ -15,6 +15,16 @@ import shutil
 from werkzeug.utils import secure_filename
 import glob
 
+__author__ = "Rahim Khoja"
+__copyright__ = "Copyright 2007, The Cogent Project"
+__credits__ = ["Rahim Khoja", "Bala", ""]
+__license__ = "MIT"
+__version__ = "0.5"
+__maintainer__ = "Rahim Khoja"
+__email__ = "rahim.khoja@ubc.ca"
+__status__ = "Development"
+
+
 # Get global variables from the environment
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
