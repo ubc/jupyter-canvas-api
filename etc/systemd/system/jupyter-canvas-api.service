@@ -1,11 +1,13 @@
 [Unit]
 Description=JupyterHub API for UBC Instructors Service
-After=multi-user.target
+After=network.service
+
 [Service]
 WorkingDirectory=/usr/share/jupyter-canvas-api
 User=root
 Group=root
 ExecStart=/usr/bin/python3 /usr/share/jupyter-canvas-api/api-server.py 
 Restart=always
+
 [Install]
 WantedBy=multi-user.target
