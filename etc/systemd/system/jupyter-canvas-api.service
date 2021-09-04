@@ -5,7 +5,7 @@ After=multi-user.target
 WorkingDirectory=/usr/share/jupyter-canvas-api
 User=root
 Group=root
-ExecStart=/usr/bin/python3 /usr/share/jupyter-canvas-api/api.py &> /var/log/jhub-ubc-api.log
+ExecStart=/usr/bin/python3 /usr/share/jupyter-canvas-api/api-server.py 
 Restart=always
 [Install]
 WantedBy=multi-user.target
