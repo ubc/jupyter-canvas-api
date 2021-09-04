@@ -1,6 +1,13 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+"""Provides NumberList and FrequencyDistribution, classes for statistics.
+
+NumberList holds a sequence of numbers, and defines several statistical
+operations (mean, stdev, etc.) FrequencyDistribution holds a mapping from
+items (not necessarily numbers) to counts, and defines operations such as
+Shannon entropy and frequency normalization.
+"""
 
 import os
 import uuid
@@ -24,9 +31,7 @@ __maintainer__ = "Rahim Khoja"
 __email__ = "rahim.khoja@ubc.ca"
 __status__ = "Development"
 
-
 # Get global variables from the environment
-
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 PORT = int(os.getenv('JUPYTER_API_PORT', '5000'))
 HOST = str(os.getenv('JUPYTER_API_HOST', '0.0.0.0'))
@@ -365,38 +370,38 @@ def put_student_report():
     TEMP_FILE_NAME = uuid.uuid4().hex  # Unique Temp File Name
     
 	# Error if StudentID Post Variable Missing
-	if not STUDENT_ID:
+    if not STUDENT_ID:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing STUDENT_ID Post Value.'
                 ), 406)
     
 	
-	if not FILE_DATA:
+    if not FILE_DATA:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing File Upload Post Data.'
                 ), 406)
     
 	
-	if not FILE_NAME:
+    if not FILE_NAME:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing File Name Value.'),
                 406)
     
-	STUDENT_PATH = HOMEDIR+STUDENT_ID
+    STUDENT_PATH = HOMEDIR+STUDENT_ID
     STUDENT_FILE_PATH = STUDENT_PATH+'/'+FILE_NAME
     STUDENT_PATH_OBJ = Path(STUDENT_PATH)
     STUDENT_FILE_PATH_OBJ = Path(STUDENT_FILE_PATH)
     
-	if not (STUDENT_PATH_OBJ.exists() and STUDENT_PATH_OBJ.is_dir()):
+    if not (STUDENT_PATH_OBJ.exists() and STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
                 error='Not Found - Student Directory Not Found',
                 message='Not Found - STUDENT_ID Home  Directory was Not Found.'
                 ), 404)
     
-	if STUDENT_FILE_PATH_OBJ.exists():
+   if STUDENT_FILE_PATH_OBJ.exists():
         return (jsonify(status=417,
                 error='Expectation Failed - Uploaded File Already Exists'
                 ,
@@ -412,12 +417,10 @@ def put_student_report():
                  + str(ALLOWED_EXTENSIONS) + ' file types.'), 417)
 
     # Save File with Temp Name to Uploads Folder
-
     FILE_DATA.save(os.path.join(app.config['UPLOAD_FOLDER'],
                    TEMP_FILE_NAME))
 
     # Move File to Student Directory from Upload Directory
-
     shutil.move(os.path.join(app.config['UPLOAD_FOLDER'],
                 TEMP_FILE_NAME), STUDENT_FILE_PATH)
 				
