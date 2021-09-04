@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-"""Provides NumberList and FrequencyDistribution, classes for statistics.
+"""Provides am API for Instructors to interact with Student Jupyter Hub Directories.
 
-NumberList holds a sequence of numbers, and defines several statistical
-operations (mean, stdev, etc.) FrequencyDistribution holds a mapping from
-items (not necessarily numbers) to counts, and defines operations such as
-Shannon entropy and frequency normalization.
+Instructors can use this API to snapshot student directories upon deadline, download 
+snapshotted directories as Zip files, download individual files from snapshots, list 
+snapshots of students directories, list files within a students snapshot, and put files
+such as reports into the students home directroy. 
+
 """
 
 import os
