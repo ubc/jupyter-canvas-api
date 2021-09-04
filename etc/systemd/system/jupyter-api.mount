@@ -1,0 +1,12 @@
+[Unit]
+Description=Mount Jupyter Cluster NFS Share for API
+After=network.target
+
+[Mount]
+What=10.1.1.138:/
+Where=/mnt/efs/
+Type=nfs4
+Options=nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport
+
+[Install]
+WantedBy=multi-user.target
