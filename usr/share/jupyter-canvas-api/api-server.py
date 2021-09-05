@@ -373,8 +373,8 @@ def put_student_report():
     STUDENT_PATH = HOMEDIR+STUDENT_ID  # Student Home Directory Path
     STUDENT_FILE_PATH = STUDENT_PATH+'/'+FILE_NAME  # Student Home File Path
 	
-    STUDENT_PATH_OBJ = Path(STUDENT_PATH) 
-    STUDENT_FILE_PATH_OBJ = Path(STUDENT_FILE_PATH)
+    STUDENT_PATH_OBJ = Path(STUDENT_PATH) # Student Home Directory Path Object
+    STUDENT_FILE_PATH_OBJ = Path(STUDENT_FILE_PATH) # Student Uploaded File Path Object
 	
     # Error if StudentID Post Variable Missing
     if not STUDENT_ID:
@@ -425,7 +425,7 @@ def put_student_report():
     FILE_DATA.save(os.path.join(app.config['UPLOAD_FOLDER'],
                    TEMP_FILE_NAME))
 
-    # Move File to Student Directory from Upload Directory
+    # Move & Rename File from Upload Directory with Temp Name to Student Home Directory with Actual Name
     shutil.move(os.path.join(app.config['UPLOAD_FOLDER'],
                 TEMP_FILE_NAME), STUDENT_FILE_PATH)
 				
