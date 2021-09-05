@@ -429,9 +429,8 @@ def put_student_report():
     shutil.move(os.path.join(app.config['UPLOAD_FOLDER'],
                 TEMP_FILE_NAME), STUDENT_FILE_PATH)
 				
-	
+    # Return Success Message
     return (jsonify('Success - File Uploaded - ' + FILE_NAME), 200)
-
 
 if __name__ == '__main__':
     app.run(host=HOST, port=PORT, debug=DEBUG)
