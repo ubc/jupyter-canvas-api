@@ -363,53 +363,57 @@ def get_snapshot_zip():
 @app.route('/put_student_report', methods=['POST'])
 @requires_apikey
 def put_student_report():
-    """ Put Specified File into Specified Student Directory. """
+    """ Put Specified File into Specified Student Home Directory. """
+
     STUDENT_ID = request.form.get('STUDENT_ID') # StudentID Post Variable
     FILE_DATA = request.files['UPLOAD_FILE']  # File Uploaded Data Post Variable
     FILE_NAME = secure_filename(FILE_DATA.filename)  # Name of File Uploaded Data
 	
     TEMP_FILE_NAME = uuid.uuid4().hex  # Unique Temp File Name
-    
-	# Error if StudentID Post Variable Missing
+    STUDENT_PATH = HOMEDIR+STUDENT_ID  # Student Home Directory Path
+    STUDENT_FILE_PATH = STUDENT_PATH+'/'+FILE_NAME  # Student Home File Path
+	
+    STUDENT_PATH_OBJ = Path(STUDENT_PATH) 
+    STUDENT_FILE_PATH_OBJ = Path(STUDENT_FILE_PATH)
+	
+    # Error if StudentID Post Variable Missing
     if not STUDENT_ID:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing STUDENT_ID Post Value.'
                 ), 406)
     
-	
+    # Error if No Data in UPLOAD_FILE Post Variable
     if not FILE_DATA:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing File Upload Post Data.'
                 ), 406)
     
-	
+    # Error if No Filename for UPLOAD_FILE Post Variable
     if not FILE_NAME:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing File Name Value.'),
                 406)
     
-    STUDENT_PATH = HOMEDIR+STUDENT_ID
-    STUDENT_FILE_PATH = STUDENT_PATH+'/'+FILE_NAME
-    STUDENT_PATH_OBJ = Path(STUDENT_PATH)
-    STUDENT_FILE_PATH_OBJ = Path(STUDENT_FILE_PATH)
-    
+    # Error if Student Home Does Not Exist
     if not (STUDENT_PATH_OBJ.exists() and STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
                 error='Not Found - Student Directory Not Found',
                 message='Not Found - STUDENT_ID Home  Directory was Not Found.'
                 ), 404)
     
-   if STUDENT_FILE_PATH_OBJ.exists():
+    # Error if File Already Exists In Student Home Directory 
+    if STUDENT_FILE_PATH_OBJ.exists():
         return (jsonify(status=417,
                 error='Expectation Failed - Uploaded File Already Exists'
                 ,
                 message='Expectation Failed - The File Uploaded Already Exists within the Student\'s Home Directory.'
                  + STUDENT_FILE_PATH), 417)
-    
-	if not ('.' in FILE_NAME and FILE_NAME.rsplit('.', 1)[1].lower()
+
+    # Error if Uploaded File Extention Not in Allowed Extentions List
+    if not ('.' in FILE_NAME and FILE_NAME.rsplit('.', 1)[1].lower()
             in ALLOWED_EXTENSIONS):
         return (jsonify(status=417,
                 error='Expectation Failed - Invalid Uploaded File Type'
@@ -417,7 +421,7 @@ def put_student_report():
                 message='Expectation Failed - The File Uploaded is Not Allowed. Please upload only '
                  + str(ALLOWED_EXTENSIONS) + ' file types.'), 417)
 
-    # Save File with Temp Name to Uploads Folder
+    # Save File with Temp Name to Upload Directory
     FILE_DATA.save(os.path.join(app.config['UPLOAD_FOLDER'],
                    TEMP_FILE_NAME))
 
