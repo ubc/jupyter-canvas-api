@@ -303,52 +303,59 @@ def get_snapshot_zip():
 	
     SNAP_PATH = SNAPDIR + STUDENT_ID
     SNAP_DATE_PATH = SNAP_PATH + '/' + SNAPSHOT_DATE
-    SNAP_PATH_OBJ = Path(SNAP_PATH)
-    SNAP_DATE_PATH_OBJ = Path(SNAP_DATE_PATH)
     ZIP_FILE_NAME = STUDENT_ID + '_' + SNAPSHOT_DATE + '.zip'
     
-	# Error if StudentID Post Variable Missing
-	if not STUDENT_ID:
+    SNAP_PATH_OBJ = Path(SNAP_PATH)
+    SNAP_DATE_PATH_OBJ = Path(SNAP_DATE_PATH)
+    
+    
+    # Error if StudentID Post Variable Missing
+    if not STUDENT_ID:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing STUDENT_ID Post Value.'
                 ), 406)
 				
-	# Error if Snapshot Name Post Variable Missing
+    # Error if Snapshot Name Post Variable Missing
     if not SNAPSHOT_DATE:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing SNAPSHOT_DATE Post Value.'
                 ), 406)
 				
-	# Error if Snapshot Directory Does Not Exist
+    # Error if Student Snapshot Directory Does Not Exist
     if not (SNAP_PATH_OBJ.exists() and SNAP_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
                 error='Not Found - Snapshot Directory was Not Found',
                 message='Not Found - Student Snapshot Directory Not Found.'
                 ), 404)
+
+    # Error if Specific Snapshot Does Not Exist
     if not (SNAP_DATE_PATH_OBJ.exists()
             and SNAP_DATE_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
                 error='Not Found - Snapshot was Not Found',
                 message='Not Found - Snapshot Not Found.'), 404)
 
+    # Create Zip File of Snapshot with Relative Path
     SNAP_FILE = io.BytesIO()  # Create Empty File In Memory
-    with zf.ZipFile(SNAP_FILE, 'w') as SNAP_ZIP_FILE:
-        for (dirname, subdirs, files) in os.walk(SNAP_DATE_PATH + '/'):
-            SNAP_ZIP_FILE.write(dirname, dirname.replace(SNAPDIR, ''))
-            for filename in files:
+    with zf.ZipFile(SNAP_FILE, 'w') as SNAP_ZIP_FILE: # Open Empty File as Zip File Object for Writing
+        for (dirname, subdirs, files) in os.walk(SNAP_DATE_PATH + '/'): # Loop Thru Snapshot Files and Directories
+            SNAP_ZIP_FILE.write(dirname, dirname.replace(SNAPDIR, ''))  # Add Directory to Zip File Object
+            for filename in files: # Loop Thru Each File in Snapshot Directory
                 SNAP_ZIP_FILE.write(os.path.join(dirname, filename),
                                     os.path.join(dirname,
                                     filename).replace(SNAPDIR, ''),
-                                    zf.ZIP_DEFLATED)
-        SNAP_ZIP_FILE.close()
-    SNAP_FILE.seek(0)
+                                    zf.ZIP_DEFLATED) # Add Snapshot File To Zip File Object
+        SNAP_ZIP_FILE.close() # Finish Writing to Zip File Object
+    SNAP_FILE.seek(0) # Reset position of Snap Zip File to Begining
 
-    response = make_response(SNAP_FILE.read())
-    response.headers.set('Content-Type', 'zip')
+    response = make_response(SNAP_FILE.read())  # Includes the Zip File into the Response
+    response.headers.set('Content-Type', 'zip') # Sets the Response Content-Type to Zip File 
     response.headers.set('Content-Disposition', 'attachment',
-                         filename='%s' % ZIP_FILE_NAME)
+                         filename='%s' % ZIP_FILE_NAME)  # Sets the Response Content-Disposition to Attachment and Incldes the File Name
+
+    # Return Reponse with Zip File
     return response
 
 
