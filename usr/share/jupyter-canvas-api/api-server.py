@@ -1,13 +1,12 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-"""Provides am API for Instructors to interact with Student Jupyter Hub Directories.
-
+"""
+Provides an API for Instructors to interact with their Students Jupyter Hub Directories.
 Instructors can use this API to snapshot student directories upon deadline, download 
 snapshotted directories as Zip files, download individual files from snapshots, list 
-snapshots of students directories, list files within a students snapshot, and put files
-such as reports into the students home directroy. 
-
+snapshots of student’s directories, list files within a students’ snapshot, and put files
+such as reports into the students’ home directory.
 """
 
 import os
@@ -32,20 +31,21 @@ __maintainer__ = "Rahim Khoja"
 __email__ = "rahim.khoja@ubc.ca"
 __status__ = "Development"
 
-# Get global variables from the environment
+# API Variables Defined by Enviroment Variable
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 PORT = int(os.getenv('JUPYTER_API_PORT', '5000'))
 HOST = str(os.getenv('JUPYTER_API_HOST', '0.0.0.0'))
+
 SNAPDIR = '/mnt/efs/snap/'
 HOMEDIR = '/mnt/efs/home/'
-FINALSNAPDIR
+FINALSNAPDIR = ''
 UPLOAD_FOLDER = os.path.join('/tmp', 'uploads')  # Temporary Upload Folder
 ALLOWED_EXTENSIONS = set(['txt', 'html', 'htm', 'ipynb', 'json']) # Allowed Upload File Types
 
 app = Flask(__name__)
 app.config['API_KEY'] = str(os.getenv('JUPYTER_API_KEY', '12345'))  # Get API_KEY from Env Variable
 
-# jsonify does not work without this option in current versions
+# JSONIFY Does Not Work Correctly Without the Following Variable
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024 # Max Upload File Size (2MB)
@@ -54,7 +54,7 @@ app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024 # Max Upload File Size (2MB)
 if not os.path.isdir(UPLOAD_FOLDER):
     os.mkdir(UPLOAD_FOLDER)
 
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER # Define Flask Upload Directory 
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER # Flask Upload Directory 
 
 @app.errorhandler(401)
 def not_authorized(e):
