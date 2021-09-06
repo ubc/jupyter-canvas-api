@@ -23,7 +23,6 @@ from werkzeug.utils import secure_filename
 import glob
 
 __author__ = "Rahim Khoja"
-__copyright__ = "Copyright 2007, The Cogent Project"
 __credits__ = ["Rahim Khoja", "Balaji Srinivasarao", "Pan Luo"]
 __license__ = "GPL"
 __version__ = "0.5"
