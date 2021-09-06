@@ -32,16 +32,16 @@ __email__ = "rahim.khoja@ubc.ca"
 __status__ = "Development"
 
 # API Variables Defined by Enviroment Variable
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
-PORT = int(os.getenv('JUPYTER_API_PORT', '5000'))
-HOST = str(os.getenv('JUPYTER_API_HOST', '0.0.0.0'))
-APIKEY = str(os.getenv('JUPYTER_API_KEY', '12345'))
+DEBUG = os.getenv('DEBUG', 'False') == 'True'   # API Debug
+PORT = int(os.getenv('JUPYTER_API_PORT', '5000'))  # API TCP Port Number
+HOST = str(os.getenv('JUPYTER_API_HOST', '0.0.0.0'))  # API TCP Addess
+APIKEY = str(os.getenv('JUPYTER_API_KEY', '12345'))  # API Key Value
 
-SNAPDIR = '/mnt/efs/snap/'
-HOMEDIR = '/mnt/efs/home/'
-FINALSNAPDIR = ''
-UPLOAD_FOLDER = os.path.join('/tmp', 'uploads')  # Temporary Upload Folder
-ALLOWED_EXTENSIONS = set(['txt', 'html', 'htm', 'ipynb', 'json']) # Allowed Upload File Types
+SNAPDIR = '/mnt/efs/snap/'   # Instructor Snapshot Directory
+HOMEDIR = '/mnt/efs/home/'   # Home Directory Root
+INTSNAPDIR = ''   # Intermediary Snapshot Directory 
+UPLOAD_FOLDER = os.path.join('/tmp', 'uploads')   # Temporary Upload Folder
+ALLOWED_EXTENSIONS = set(['txt', 'html', 'htm', 'ipynb', 'json'])   # Allowed Upload File Types
 
 app = Flask(__name__)
 
@@ -53,7 +53,7 @@ app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024 # Max Upload File Size (2MB)
 
-# Create Temporary Directory If Does Not Exist
+# Create Upload Directory If Does Not Exist
 if not os.path.isdir(UPLOAD_FOLDER):
     os.mkdir(UPLOAD_FOLDER)
 
@@ -93,19 +93,23 @@ def requires_apikey(f):
 @app.route('/')
 def index():
     return (jsonify(message='UBC Canvas / JupyterHub Instructor API',
+            url=url_for('get_snapshot_file_list', _external=True),
             url=url_for('get_snapshot_list', _external=True),
+            url=url_for('get_snapshot_file', _external=True),
+	    url=url_for('get_snapshot_zip', _external=True),
+	    url=url_for('put_student_report', _external=True),
             version='1.0'), 200)
 
 
 #
 # Curl Usage Command Examples For '/get_snapshot_file_list' API Call
-# Required Post Variables: STUDENT_ID, SNAPSHOT_DATE
+# Required Post Variables: STUDENT_ID, SNAPSHOT_NAME
 # Required Header Variables: X-Api-Key
 # Example Respose: ["file2.txt","jupyterhubtest.txt","file1.txt","subdir_test/subdir_file1.txt"]
 #
-# curl -i -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_DATE=12-08-2021" http://localhost:5000/get_snapshot_file_list
-# curl -i -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_DATE=12-08-2021" http://localhost:5000/get_snapshot_file_list
-# curl -i -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_DATE=12-08-2021" http://localhost:5000/get_snapshot_file_list
+# curl -i -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_file_list
+# curl -i -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_file_list
+# curl -i -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_file_list
 #
 @app.route('/get_snapshot_file_list', methods=['POST'])
 @requires_apikey
@@ -113,13 +117,13 @@ def get_snapshot_file_list():
     """ Get List of Snapshot Files for the Specfied Student and Snapshot. """
     
     STUDENT_ID = request.form.get('STUDENT_ID')  # StudentID Post Variable
-    SNAPSHOT_DATE = request.form.get('SNAPSHOT_DATE')  # Snapshot Name Variable
+    SNAPSHOT_NAME = request.form.get('SNAPSHOT_NAME')  # Snapshot Name Variable
     
     SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
-    SNAP_DATE_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_DATE  # Student Snapshot Path
+    SNAP_NAME_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_DATE  # Student Snapshot Path
 
     SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
-    SNAP_DATE_PATH_OBJ = Path(SNAP_DATE_PATH)  # Student Snapshot Path Object
+    SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
     
     # Error if StudentID Post Variable Missing
     if not STUDENT_ID:
@@ -129,10 +133,10 @@ def get_snapshot_file_list():
                 ), 406)
                 
     # Error if Snapshot Name Post Variable Missing
-    if not SNAPSHOT_DATE:
+    if not SNAPSHOT_NAME:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
-                message='Not Acceptable - Missing SNAPSHOT_DATE Post Value.'
+                message='Not Acceptable - Missing SNAPSHOT_NAME Post Value.'
                 ), 406)
 
     # Error if Snapshot Directory Does Not Exist
@@ -143,8 +147,8 @@ def get_snapshot_file_list():
                 ), 404)
     
     # Error if Specfic Snapshot Does Not Exist
-    if not (SNAP_DATE_PATH_OBJ.exists()
-            and SNAP_DATE_PATH_OBJ.is_dir()):
+    if not (SNAP_NAME_PATH_OBJ.exists()
+            and SNAP_NAME_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
                 error='Not Found - Snapshot was Not Found',
                 message='Not Found - Snapshot Not Found.'), 404)
@@ -220,14 +224,14 @@ def get_snapshot_list():
 
 #
 # Curl Usage Command Examples For '/get_snapshot_file' API Call
-# Required Post Variables: STUDENT_ID, SNAPSHOT_DATE, SNAPSHOT_FILENAME
+# Required Post Variables: STUDENT_ID, SNAPSHOT_NAME, SNAPSHOT_FILENAME
 # Required Header Variables: X-Api-Key
 # Example Respose: 
 #
-# curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_DATE=12-08-2021" -d "SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
-# curl -OJ -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_DATE=12-08-2021" -F "SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
-# curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714&SNAPSHOT_DATE=12-08-2021&SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
-# curl -OJ -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_DATE=12-08-2021&SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
+# curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" -d "SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
+# curl -OJ -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=12-08-2021" -F "SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
+# curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021&SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
+# curl -OJ -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021&SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
 #
 @app.route('/get_snapshot_file', methods=['POST'])
 @requires_apikey
@@ -235,15 +239,15 @@ def get_snapshot_file():
     """ Get the Specified File from Specified Student Snapshot. """
 
     STUDENT_ID = request.form.get('STUDENT_ID')  # StudentID Post Variable
-    SNAPSHOT_DATE = request.form.get('SNAPSHOT_DATE')  # Snapshot Name Variable
+    SNAPSHOT_NAME = request.form.get('SNAPSHOT_NAME')  # Snapshot Name Variable
     SNAPSHOT_FILENAME = request.form.get('SNAPSHOT_FILENAME')  # Snapshot File Name Variable
 	
     SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
-    SNAP_DATE_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_DATE  # Student Snapshot Path
+    SNAP_NAME_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_NAME  # Student Snapshot Path
     SNAP_FILE_PATH = SNAP_DATE_PATH+'/'+SNAPSHOT_FILENAME  # Student Snapshot File Path
     
     SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
-    SNAP_DATE_PATH_OBJ = Path(SNAP_DATE_PATH)  # Student Snapshot Path Object
+    SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
     SNAP_FILE_PATH_OBJ = Path(SNAP_FILE_PATH)  # Student Snapshot File Path Object
 	
     # Error if StudentID Post Variable Missing
@@ -254,10 +258,10 @@ def get_snapshot_file():
                 ), 406)
     
     # Error if Snapshot Name Post Variable Missing
-    if not SNAPSHOT_DATE:
+    if not SNAPSHOT_NAME:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
-                message='Not Acceptable - Missing SNAPSHOT_DATE Post Value.'
+                message='Not Acceptable - Missing SNAPSHOT_NAME Post Value.'
                 ), 406)
     
     # Error if Snapshot Directory Does Not Exist
@@ -268,8 +272,8 @@ def get_snapshot_file():
                 ), 404)
     
     # Error if Specfic Snapshot Does Not Exist
-    if not (SNAP_DATE_PATH_OBJ.exists()
-            and SNAP_DATE_PATH_OBJ.is_dir()):
+    if not (SNAP_NAME_PATH_OBJ.exists()
+            and SNAP_NAME_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
                 error='Not Found - Snapshot was Not Found',
                 message='Not Found - Snapshot Not Found.'), 404)
@@ -303,13 +307,13 @@ def get_snapshot_file():
 
 #
 # Curl Usage Command Examples For '/get_snapshot_zip' API Call
-# Required Post Variables: STUDENT_ID, SNAPSHOT_DATE
+# Required Post Variables: STUDENT_ID, SNAPSHOT_NAME
 # Required Header Variables: X-Api-Key
 # Example Respose: 
 #
-# curl -OJ -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_DATE=12-08-2021" http://localhost:5000/get_snapshot_zip
-# curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_DATE=12-08-2021" http://localhost:5000/get_snapshot_zip
-# curl -OJ -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_DATE=12-08-2021" http://localhost:5000/get_snapshot_zip
+# curl -OJ -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_zip
+# curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_zip
+# curl -OJ -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_zip
 #
 @app.route('/get_snapshot_zip', methods=['POST'])
 @requires_apikey
@@ -317,14 +321,14 @@ def get_snapshot_zip():
     """ Get Zip File of Specified Student Snapshot. """
 
     STUDENT_ID = request.form.get('STUDENT_ID')   # StudentID Post Variable
-    SNAPSHOT_DATE = request.form.get('SNAPSHOT_DATE')  # Snapshot Name Variable
+    SNAPSHOT_NAME = request.form.get('SNAPSHOT_NAME')  # Snapshot Name Variable
 	
     SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
-    SNAP_DATE_PATH = SNAP_PATH+'/'+SNAPSHOT_DATE  # Student Snapshot Path
-    ZIP_FILE_NAME = STUDENT_ID+'_'+SNAPSHOT_DATE+'.zip' # Snapshot Zip File Name
+    SNAP_NAME_PATH = SNAP_PATH+'/'+SNAPSHOT_NAME  # Student Snapshot Path
+    ZIP_FILE_NAME = STUDENT_ID+'_'+SNAPSHOT_NAME+'.zip' # Snapshot Zip File Name
     
     SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
-    SNAP_DATE_PATH_OBJ = Path(SNAP_DATE_PATH)  # Student Snapshot Path Object
+    SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
     
     
     # Error if StudentID Post Variable Missing
@@ -335,10 +339,10 @@ def get_snapshot_zip():
                 ), 406)
 				
     # Error if Snapshot Name Post Variable Missing
-    if not SNAPSHOT_DATE:
+    if not SNAPSHOT_NAME:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
-                message='Not Acceptable - Missing SNAPSHOT_DATE Post Value.'
+                message='Not Acceptable - Missing SNAPSHOT_NAME Post Value.'
                 ), 406)
 				
     # Error if Student Snapshot Directory Does Not Exist
@@ -349,8 +353,8 @@ def get_snapshot_zip():
                 ), 404)
 
     # Error if Specific Snapshot Does Not Exist
-    if not (SNAP_DATE_PATH_OBJ.exists()
-            and SNAP_DATE_PATH_OBJ.is_dir()):
+    if not (SNAP_NAME_PATH_OBJ.exists()
+            and SNAP_NAME_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
                 error='Not Found - Snapshot was Not Found',
                 message='Not Found - Snapshot Not Found.'), 404)
