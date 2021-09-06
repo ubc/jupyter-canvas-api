@@ -280,14 +280,14 @@ def get_snapshot_file():
         SNAPSHOT_SHORT_FILENAME = SNAPSHOT_FILENAME
 
     SNAPSHOT_FILE_BYTES = ''  # Empty File Variable
-    with open(SNAP_FILE_PATH, 'rb') as OPEN_FILE:
+    with open(SNAP_FILE_PATH, 'rb') as OPEN_FILE:  # Open Snapshot File and Read it into the File Variable
         SNAPSHOT_FILE_BYTES = OPEN_FILE.read()
 
     # Create Response With Requested File
-    response = make_response(SNAPSHOT_FILE_BYTES)
-    response.headers.set('Content-Type', SNAPSHOT_FILE_EXTENSION)
+    response = make_response(SNAPSHOT_FILE_BYTES)  # Includes the Snaphot File into the Response
+    response.headers.set('Content-Type', SNAPSHOT_FILE_EXTENSION)  # Sets the Response Content-Type to File Extension of Snapshot File
     response.headers.set('Content-Disposition', 'attachment',
-                         filename='%s' % SNAPSHOT_SHORT_FILENAME)
+                         filename='%s' % SNAPSHOT_SHORT_FILENAME)  # Sets the Response Content-Disposition to Attachment and Includes the File Name
 
     # Return Response with Requested Snapshot File
     return response
