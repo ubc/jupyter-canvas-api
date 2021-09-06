@@ -40,7 +40,7 @@ SNAPDIR = '/mnt/efs/snap/'   # Instructor Snapshot Directory
 HOMEDIR = '/mnt/efs/home/'   # Home Directory Root
 INTSNAPDIR = ''   # Intermediary Snapshot Directory
 UPLOAD_FOLDER = os.path.join('/tmp', 'uploads')   # Temporary Upload Folder
-ALLOWED_EXTENSIONS = set(['txt', 'html', 'htm', 'ipynb', 'json'])   # Allowed Upload File Types
+ALLOWED_EXTENSIONS = set(['txt', 'html', 'htm', 'ipynb'])   # Allowed Upload File Types
 
 app = Flask(__name__)
 
