@@ -33,7 +33,7 @@ __status__ = "Development"
 # API Variables Defined by Enviroment Variable
 DEBUG = os.getenv('DEBUG', 'False') == 'True'   # API Debug
 PORT = int(os.getenv('JUPYTER_API_PORT', '5000'))  # API TCP Port Number
-HOST = str(os.getenv('JUPYTER_API_HOST', '0.0.0.0'))  # API TCP Addess
+HOST = str(os.getenv('JUPYTER_API_HOST', '0.0.0.0'))  # API TCP Address
 APIKEY = str(os.getenv('JUPYTER_API_KEY', '12345'))  # API Key Value
 
 SNAPDIR = '/mnt/efs/snap/'   # Instructor Snapshot Directory
@@ -61,14 +61,14 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER # Flask Upload Directory
 # Default Flask HTTP 401 Error
 @app.errorhandler(401)
 def not_authorized(e):
-    """ Respose sent back when not autorized """
+    """ Response sent back when not authorized. """
 
     return (jsonify(status=401, error='Not Authorized',
             message='You are authorized to access the URL requested.'),
             401)
 
 def check_auth():
-    """ Checks the environment that the API_KEY has been set """
+    """ Checks the environment that the API_KEY has been set. """
 
     if app.config['API_KEY']:
         return app.config['API_KEY'] == request.headers.get('X-Api-Key')
@@ -76,7 +76,7 @@ def check_auth():
 
 # Function Required For Flask Routes Secured by API Key
 def requires_apikey(f):
-    """ Decorator function to require API Key """
+    """ Decorator function to require API Key. """
 
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -93,7 +93,7 @@ def requires_apikey(f):
 # Curl Usage Command Examples For '/get_snapshot_file_list' API Call
 # Required Post Variables: STUDENT_ID, SNAPSHOT_NAME
 # Required Header Variables: X-Api-Key
-# Example Respose: ["file2.txt","jupyterhubtest.txt","file1.txt","subdir_test/subdir_file1.txt"]
+# Example Response: ["file2.txt","jupyterhubtest.txt","file1.txt","subdir_test/subdir_file1.txt"]
 #
 # curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_file_list
 # curl -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_file_list
@@ -134,7 +134,7 @@ def get_snapshot_file_list():
                 message='Not Found - Student Snapshot Directory Not Found.'
                 ), 404)
 
-    # Error if Specfic Snapshot Does Not Exist
+    # Error if Specific Snapshot Does Not Exist
     if not (SNAP_NAME_PATH_OBJ.exists()
             and SNAP_NAME_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
@@ -163,7 +163,7 @@ def get_snapshot_file_list():
 # Curl Usage Command Examples For '/get_snapshot_list' API Call
 # Required Post Variables: STUDENT_ID
 # Required Header Variables: X-Api-Key
-# Example Respose: ["12-08-2021","11-07-2020"]
+# Example Response: ["12-08-2021","11-07-2020"]
 #
 # curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714" http://localhost:5000/get_snapshot_list
 # curl -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" http://localhost:5000/get_snapshot_list
@@ -172,7 +172,7 @@ def get_snapshot_file_list():
 @app.route('/get_snapshot_list', methods=['POST'])
 @requires_apikey
 def get_snapshot_list():
-    """ Get List of Snapshot Directories for the Specfied Student. """
+    """ Get List of Snapshot Directories for the Specified Student. """
 
     STUDENT_ID = request.form.get('STUDENT_ID')  # StudentID Post Variable
 
@@ -214,7 +214,7 @@ def get_snapshot_list():
 # Curl Usage Command Examples For '/get_snapshot_file' API Call
 # Required Post Variables: STUDENT_ID, SNAPSHOT_NAME, SNAPSHOT_FILENAME
 # Required Header Variables: X-Api-Key
-# Example Respose: curl: Saved to filename 'subdir_file1.txt'
+# Example Response: curl: Saved to filename 'subdir_file1.txt'
 #
 # curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" -d "SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
 # curl -OJ -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=12-08-2021" -F "SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
@@ -259,7 +259,7 @@ def get_snapshot_file():
                 message='Not Found - Student Snapshot Directory Not Found.'
                 ), 404)
 
-    # Error if Specfic Snapshot Does Not Exist
+    # Error if Specific Snapshot Does Not Exist
     if not (SNAP_NAME_PATH_OBJ.exists()
             and SNAP_NAME_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
@@ -297,7 +297,7 @@ def get_snapshot_file():
 # Curl Usage Command Examples For '/get_snapshot_zip' API Call
 # Required Post Variables: STUDENT_ID, SNAPSHOT_NAME
 # Required Header Variables: X-Api-Key
-# Example Respose: curl: Saved to filename '31387714_12-08-2021.zip'
+# Example Response: curl: Saved to filename '31387714_12-08-2021.zip'
 #
 # curl -OJ -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_zip
 # curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_zip
@@ -358,14 +358,14 @@ def get_snapshot_zip():
                                     filename).replace(SNAPDIR, ''),
                                     zf.ZIP_DEFLATED) # Add Snapshot File To Zip File Object
         SNAP_ZIP_FILE.close() # Finish Writing to Zip File Object
-    SNAP_FILE.seek(0) # Reset position of Snap Zip File to Begining
+    SNAP_FILE.seek(0) # Reset position of Snap Zip File to Beginning
 
     response = make_response(SNAP_FILE.read())  # Includes the Zip File into the Response
     response.headers.set('Content-Type', 'zip') # Sets the Response Content-Type to Zip File
     response.headers.set('Content-Disposition', 'attachment',
-                         filename='%s' % ZIP_FILE_NAME)  # Sets the Response Content-Disposition to Attachment and Incldes the File Name
+                         filename='%s' % ZIP_FILE_NAME)  # Sets the Response Content-Disposition to Attachment and Includes the File Name
 
-    # Return Reponse with Zip File
+    # Return Response with Zip File
     return response
 
 
@@ -373,7 +373,7 @@ def get_snapshot_zip():
 # Curl Usage Command Examples For '/put_student_report' API Call
 # Required Post Variables: STUDENT_ID, file (Pointer to Actual File)
 # Required Header Variables: X-Api-Key
-# Example Respose: "Success - File Uploaded - upload_test.txt"
+# Example Response: "Success - File Uploaded - upload_test.txt"
 #
 # curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F UPLOAD_FILE=@upload_test.txt http://localhost:5000/put_student_report
 #
@@ -418,7 +418,7 @@ def put_student_report():
     if not (STUDENT_PATH_OBJ.exists() and STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
                 error='Not Found - Student Directory Not Found',
-                message='Not Found - STUDENT_ID Home  Directory was Not Found.'
+                message='Not Found - STUDENT_ID Home Directory was Not Found.'
                 ), 404)
 
     # Error if File Already Exists In Student Home Directory
@@ -429,7 +429,7 @@ def put_student_report():
                 message='Expectation Failed - The File Uploaded Already Exists within the Student\'s Home Directory.'
                  + STUDENT_FILE_PATH), 417)
 
-    # Error if Uploaded File Extention Not in Allowed Extentions List
+    # Error if Uploaded File Extension Not in Allowed Extensions List
     if not ('.' in FILE_NAME and FILE_NAME.rsplit('.', 1)[1].lower()
             in ALLOWED_EXTENSIONS):
         return (jsonify(status=417,
