@@ -109,11 +109,14 @@ def index():
 def get_snapshot_file_list():
     """ Get List of Snapshot Files for the Specfied Student and Snapshot. """
     
-    STUDENT_ID = request.form.get('STUDENT_ID')   # StudentID Post Variable
+    STUDENT_ID = request.form.get('STUDENT_ID')  # StudentID Post Variable
     SNAPSHOT_DATE = request.form.get('SNAPSHOT_DATE')  # Snapshot Name Variable
     
-    SNAP_PATH = SNAPDIR+STUDENT_ID+'/'+SNAPSHOT_DATE # Snapshot Directory
-    SNAP_PATH_OBJ = Path(SNAP_PATH)
+    SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
+    SNAP_DATE_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_DATE  # Student Snapshot Path
+
+    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
+    SNAP_DATE_PATH_OBJ = Path(SNAP_DATE_PATH)  # Student Snapshot Path Object
     
     # Error if StudentID Post Variable Missing
     if not STUDENT_ID:
@@ -130,11 +133,18 @@ def get_snapshot_file_list():
                 ), 406)
 
     # Error if Snapshot Directory Does Not Exist
-    if not (SNAP_PATH_OBJ.exists() and SNAP_PATH_OBJ.is_dir()):
+    if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
                 error='Not Found - Snapshot Directory was Not Found',
                 message='Not Found - Student Snapshot Directory Not Found.'
-                 + SNAP_PATH), 404)
+                ), 404)
+    
+    # Error if Specfic Snapshot Does Not Exist
+    if not (SNAP_DATE_PATH_OBJ.exists()
+            and SNAP_DATE_PATH_OBJ.is_dir()):
+        return (jsonify(status=404,
+                error='Not Found - Snapshot was Not Found',
+                message='Not Found - Snapshot Not Found.'), 404)
 
     # Get List Of Files In Snapshot Directory
     SNAPSHOT_FILES = glob.glob(os.path.join(SNAP_PATH+'/', '**/*'),
@@ -150,7 +160,7 @@ def get_snapshot_file_list():
                 message='Not Found - No Snapshot Directories Found.'),
                 404)
 
-	# Return List of Snapshot Files
+    # Return List of Snapshot Files
     return (jsonify(SNAPSHOT_FILES), 200)
 
 
@@ -169,20 +179,21 @@ def get_snapshot_file_list():
 def get_snapshot_list():
     """ Get List of Snapshot Directories for the Specfied Student. """
 	
-    STUDENT_ID = request.form.get('STUDENT_ID')   # StudentID Post Variable
+    STUDENT_ID = request.form.get('STUDENT_ID')  # StudentID Post Variable
 	
-    SNAP_PATH = SNAPDIR + STUDENT_ID
-    PATH_OBJ = Path(SNAP_PATH)
+    SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
+
+    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
 	
-	# Error if StudentID Post Variable Missing
+    # Error if StudentID Post Variable Missing
     if not STUDENT_ID:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing StudentID Post Value.'
                 ), 406)
 				
-	# Error if Snapshot Directory Does Not Exist
-    if not (PATH_OBJ.exists() and PATH_OBJ.is_dir()):
+    # Error if Snapshot Directory Does Not Exist
+    if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
                 error='Not Found - Snapshot Directory was Not Found',
                 message='Not Found - Student Snapshot Directory Not Found.'
@@ -193,13 +204,14 @@ def get_snapshot_list():
     SNAPSHOTS = [x for x in SNAPSHOTS if '.' not in x]
     SNAPSHOTS = [s.replace(SNAP_PATH + '/', '') for s in SNAPSHOTS]
 
+    # Errot No Snapshots Found
     if not SNAPSHOTS:
         return (jsonify(status=404,
                 error='Not Found - No Snapshots Found',
                 message='Not Found - No Snapshot Directories Found.'),
                 404)
 				
-	
+    # Return List of Student Snapshots
     return (jsonify(SNAPSHOTS), 200)
 
 
@@ -219,47 +231,48 @@ def get_snapshot_list():
 def get_snapshot_file():
     """ Get the Specified File from Specified Student Snapshot. """
 
-    STUDENT_ID = request.form.get('STUDENT_ID')   # StudentID Post Variable
+    STUDENT_ID = request.form.get('STUDENT_ID')  # StudentID Post Variable
     SNAPSHOT_DATE = request.form.get('SNAPSHOT_DATE')  # Snapshot Name Variable
     SNAPSHOT_FILENAME = request.form.get('SNAPSHOT_FILENAME')  # Snapshot File Name Variable
 	
-    SNAP_PATH = SNAPDIR + STUDENT_ID
-    SNAP_DATE_PATH = SNAP_PATH + '/' + SNAPSHOT_DATE
-    SNAP_PATH_OBJ = Path(SNAP_PATH)
-    SNAP_DATE_PATH_OBJ = Path(SNAP_DATE_PATH)
-    SNAP_FILE_PATH = SNAP_DATE_PATH + '/' + SNAPSHOT_FILENAME
-    SNAP_FILE_PATH_OBJ = Path(SNAP_FILE_PATH)
+    SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
+    SNAP_DATE_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_DATE  # Student Snapshot Path
+    SNAP_FILE_PATH = SNAP_DATE_PATH+'/'+SNAPSHOT_FILENAME  # Student Snapshot File Path
+    
+    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
+    SNAP_DATE_PATH_OBJ = Path(SNAP_DATE_PATH)  # Student Snapshot Path Object
+    SNAP_FILE_PATH_OBJ = Path(SNAP_FILE_PATH)  # Student Snapshot File Path Object
 	
-	# Error if StudentID Post Variable Missing
+    # Error if StudentID Post Variable Missing
     if not STUDENT_ID:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing STUDENT_ID Post Value.'
                 ), 406)
     
-	# Error if Snapshot Name Post Variable Missing
-	if not SNAPSHOT_DATE:
+    # Error if Snapshot Name Post Variable Missing
+    if not SNAPSHOT_DATE:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing SNAPSHOT_DATE Post Value.'
                 ), 406)
     
-	# Error if Snapshot Directory Does Not Exist
-	if not (SNAP_PATH_OBJ.exists() and SNAP_PATH_OBJ.is_dir()):
+    # Error if Snapshot Directory Does Not Exist
+    if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
                 error='Not Found - Snapshot Directory was Not Found',
                 message='Not Found - Student Snapshot Directory Not Found.'
                 ), 404)
     
-	# Error if Specfic Snapshot Does Not Exist
-	if not (SNAP_DATE_PATH_OBJ.exists()
+    # Error if Specfic Snapshot Does Not Exist
+    if not (SNAP_DATE_PATH_OBJ.exists()
             and SNAP_DATE_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
                 error='Not Found - Snapshot was Not Found',
                 message='Not Found - Snapshot Not Found.'), 404)
     
-	# Error if Snapshot File Does Not Exist
-	if not (SNAP_FILE_PATH_OBJ.exists()
+    # Error if Requested Snapshot File Does Not Exist
+    if not (SNAP_FILE_PATH_OBJ.exists()
             and SNAP_FILE_PATH_OBJ.is_file()):
         return (jsonify(status=404,
                 error='Not Found - Snapshot File was Not Found',
@@ -275,11 +288,13 @@ def get_snapshot_file():
     with open(SNAP_FILE_PATH, 'rb') as OPEN_FILE:
         SNAPSHOT_FILE_BYTES = OPEN_FILE.read()
 
-    # Create Response With File
+    # Create Response With Requested File
     response = make_response(SNAPSHOT_FILE_BYTES)
     response.headers.set('Content-Type', SNAPSHOT_FILE_EXTENSION)
     response.headers.set('Content-Disposition', 'attachment',
                          filename='%s' % SNAPSHOT_SHORT_FILENAME)
+
+    # Return Response with Requested Snapshot File
     return response
 
 
@@ -301,12 +316,12 @@ def get_snapshot_zip():
     STUDENT_ID = request.form.get('STUDENT_ID')   # StudentID Post Variable
     SNAPSHOT_DATE = request.form.get('SNAPSHOT_DATE')  # Snapshot Name Variable
 	
-    SNAP_PATH = SNAPDIR + STUDENT_ID
-    SNAP_DATE_PATH = SNAP_PATH + '/' + SNAPSHOT_DATE
-    ZIP_FILE_NAME = STUDENT_ID + '_' + SNAPSHOT_DATE + '.zip'
+    SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
+    SNAP_DATE_PATH = SNAP_PATH+'/'+SNAPSHOT_DATE  # Student Snapshot Path
+    ZIP_FILE_NAME = STUDENT_ID+'_'+SNAPSHOT_DATE+'.zip' # Snapshot Zip File Name
     
-    SNAP_PATH_OBJ = Path(SNAP_PATH)
-    SNAP_DATE_PATH_OBJ = Path(SNAP_DATE_PATH)
+    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
+    SNAP_DATE_PATH_OBJ = Path(SNAP_DATE_PATH)  # Student Snapshot Path Object
     
     
     # Error if StudentID Post Variable Missing
@@ -324,7 +339,7 @@ def get_snapshot_zip():
                 ), 406)
 				
     # Error if Student Snapshot Directory Does Not Exist
-    if not (SNAP_PATH_OBJ.exists() and SNAP_PATH_OBJ.is_dir()):
+    if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
                 error='Not Found - Snapshot Directory was Not Found',
                 message='Not Found - Student Snapshot Directory Not Found.'
