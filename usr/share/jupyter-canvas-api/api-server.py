@@ -24,8 +24,8 @@ import glob
 
 __author__ = "Rahim Khoja"
 __copyright__ = "Copyright 2007, The Cogent Project"
-__credits__ = ["Rahim Khoja", "Bala", ""]
-__license__ = "MIT"
+__credits__ = ["Rahim Khoja", "Balaji Srinivasarao", "Pan Luo"]
+__license__ = "GPL"
 __version__ = "0.5"
 __maintainer__ = "Rahim Khoja"
 __email__ = "rahim.khoja@ubc.ca"
@@ -35,6 +35,7 @@ __status__ = "Development"
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 PORT = int(os.getenv('JUPYTER_API_PORT', '5000'))
 HOST = str(os.getenv('JUPYTER_API_HOST', '0.0.0.0'))
+APIKEY = str(os.getenv('JUPYTER_API_KEY', '12345'))
 
 SNAPDIR = '/mnt/efs/snap/'
 HOMEDIR = '/mnt/efs/home/'
@@ -43,7 +44,9 @@ UPLOAD_FOLDER = os.path.join('/tmp', 'uploads')  # Temporary Upload Folder
 ALLOWED_EXTENSIONS = set(['txt', 'html', 'htm', 'ipynb', 'json']) # Allowed Upload File Types
 
 app = Flask(__name__)
-app.config['API_KEY'] = str(os.getenv('JUPYTER_API_KEY', '12345'))  # Get API_KEY from Env Variable
+
+# Provide API Key Value to Flask
+app.config['API_KEY'] = APIKEY
 
 # JSONIFY Does Not Work Correctly Without the Following Variable
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
@@ -56,6 +59,7 @@ if not os.path.isdir(UPLOAD_FOLDER):
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER # Flask Upload Directory 
 
+# Default Flask HTTP 401 Error
 @app.errorhandler(401)
 def not_authorized(e):
     """ Respose sent back when not autorized """
@@ -64,7 +68,6 @@ def not_authorized(e):
             message='You are authorized to access the URL requested.'),
             401)
 
-
 def check_auth():
     """ Checks the environment that the API_KEY has been set """
 
@@ -72,7 +75,7 @@ def check_auth():
         return app.config['API_KEY'] == request.headers.get('X-Api-Key')
     return False
 
-
+# Function Required For Flask Routes Secured by API Key
 def requires_apikey(f):
     """ Decorator function to require API Key """
 
@@ -204,7 +207,7 @@ def get_snapshot_list():
     SNAPSHOTS = [x for x in SNAPSHOTS if '.' not in x]
     SNAPSHOTS = [s.replace(SNAP_PATH + '/', '') for s in SNAPSHOTS]
 
-    # Errot No Snapshots Found
+    # Error No Snapshots Found
     if not SNAPSHOTS:
         return (jsonify(status=404,
                 error='Not Found - No Snapshots Found',
