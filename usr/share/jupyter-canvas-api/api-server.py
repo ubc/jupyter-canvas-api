@@ -3,8 +3,8 @@
 
 """
 Provides an API for Instructors to interact with their Students Jupyter Hub Directories.
-Instructors can use this API to snapshot student directories upon deadline, download 
-snapshotted directories as Zip files, download individual files from snapshots, list 
+Instructors can use this API to snapshot student directories upon deadline, download
+snapshotted directories as Zip files, download individual files from snapshots, list
 snapshots of student’s directories, list files within a students’ snapshot, and put files
 such as reports into the students’ home directory.
 """
@@ -39,7 +39,7 @@ APIKEY = str(os.getenv('JUPYTER_API_KEY', '12345'))  # API Key Value
 
 SNAPDIR = '/mnt/efs/snap/'   # Instructor Snapshot Directory
 HOMEDIR = '/mnt/efs/home/'   # Home Directory Root
-INTSNAPDIR = ''   # Intermediary Snapshot Directory 
+INTSNAPDIR = ''   # Intermediary Snapshot Directory
 UPLOAD_FOLDER = os.path.join('/tmp', 'uploads')   # Temporary Upload Folder
 ALLOWED_EXTENSIONS = set(['txt', 'html', 'htm', 'ipynb', 'json'])   # Allowed Upload File Types
 
@@ -57,7 +57,7 @@ app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024 # Max Upload File Size (2MB)
 if not os.path.isdir(UPLOAD_FOLDER):
     os.mkdir(UPLOAD_FOLDER)
 
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER # Flask Upload Directory 
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER # Flask Upload Directory
 
 # Default Flask HTTP 401 Error
 @app.errorhandler(401)
@@ -90,48 +90,37 @@ def requires_apikey(f):
     return decorated
 
 
-@app.route('/')
-def index():
-    return (jsonify(message='UBC Canvas / JupyterHub Instructor API',
-            url=url_for('get_snapshot_file_list', _external=True),
-            url=url_for('get_snapshot_list', _external=True),
-            url=url_for('get_snapshot_file', _external=True),
-	    url=url_for('get_snapshot_zip', _external=True),
-	    url=url_for('put_student_report', _external=True),
-            version='1.0'), 200)
-
-
 #
 # Curl Usage Command Examples For '/get_snapshot_file_list' API Call
 # Required Post Variables: STUDENT_ID, SNAPSHOT_NAME
 # Required Header Variables: X-Api-Key
 # Example Respose: ["file2.txt","jupyterhubtest.txt","file1.txt","subdir_test/subdir_file1.txt"]
 #
-# curl -i -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_file_list
-# curl -i -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_file_list
-# curl -i -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_file_list
+# curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_file_list
+# curl -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_file_list
+# curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_file_list
 #
 @app.route('/get_snapshot_file_list', methods=['POST'])
 @requires_apikey
 def get_snapshot_file_list():
     """ Get List of Snapshot Files for the Specfied Student and Snapshot. """
-    
+
     STUDENT_ID = request.form.get('STUDENT_ID')  # StudentID Post Variable
     SNAPSHOT_NAME = request.form.get('SNAPSHOT_NAME')  # Snapshot Name Variable
-    
+
     SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
-    SNAP_NAME_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_DATE  # Student Snapshot Path
+    SNAP_NAME_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_NAME  # Student Snapshot Path
 
     SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
     SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
-    
+
     # Error if StudentID Post Variable Missing
     if not STUDENT_ID:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing StudentID Post Value.'
                 ), 406)
-                
+
     # Error if Snapshot Name Post Variable Missing
     if not SNAPSHOT_NAME:
         return (jsonify(status=406,
@@ -145,7 +134,7 @@ def get_snapshot_file_list():
                 error='Not Found - Snapshot Directory was Not Found',
                 message='Not Found - Student Snapshot Directory Not Found.'
                 ), 404)
-    
+
     # Error if Specfic Snapshot Does Not Exist
     if not (SNAP_NAME_PATH_OBJ.exists()
             and SNAP_NAME_PATH_OBJ.is_dir()):
@@ -154,12 +143,12 @@ def get_snapshot_file_list():
                 message='Not Found - Snapshot Not Found.'), 404)
 
     # Get List Of Files In Snapshot Directory
-    SNAPSHOT_FILES = glob.glob(os.path.join(SNAP_PATH+'/', '**/*'),
+    SNAPSHOT_FILES = glob.glob(os.path.join(SNAP_NAME_PATH+'/', '**/*'),
                                recursive=True)
     SNAPSHOT_FILES = [f for f in SNAPSHOT_FILES if os.path.isfile(f)]
-    SNAPSHOT_FILES = [s.replace(SNAP_PATH+'/', '') for s in
+    SNAPSHOT_FILES = [s.replace(SNAP_NAME_PATH+'/', '') for s in
                       SNAPSHOT_FILES]
-    
+
     # Error if No Snapshot Files Found
     if not SNAPSHOT_FILES:
         return (jsonify(status=404,
@@ -175,30 +164,30 @@ def get_snapshot_file_list():
 # Curl Usage Command Examples For '/get_snapshot_list' API Call
 # Required Post Variables: STUDENT_ID
 # Required Header Variables: X-Api-Key
-# Example Respose: 
+# Example Respose: ["12-08-2021","11-07-2020"]
 #
-# curl -i -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714" http://localhost:5000/get_snapshot_list
-# curl -i -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" http://localhost:5000/get_snapshot_list
-# curl -i -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" http://localhost:5000/get_snapshot_list
+# curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714" http://localhost:5000/get_snapshot_list
+# curl -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" http://localhost:5000/get_snapshot_list
+# curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" http://localhost:5000/get_snapshot_list
 #
 @app.route('/get_snapshot_list', methods=['POST'])
 @requires_apikey
 def get_snapshot_list():
     """ Get List of Snapshot Directories for the Specfied Student. """
-	
+
     STUDENT_ID = request.form.get('STUDENT_ID')  # StudentID Post Variable
-	
+
     SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
 
     SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
-	
+
     # Error if StudentID Post Variable Missing
     if not STUDENT_ID:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing StudentID Post Value.'
                 ), 406)
-				
+
     # Error if Snapshot Directory Does Not Exist
     if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
@@ -207,9 +196,9 @@ def get_snapshot_list():
                 ), 404)
 
     # Get List of Directories in Student Snapshot Directory
-    SNAPSHOTS = [f.path for f in os.scandir(SNAP_PATH) if f.is_dir()]
+    SNAPSHOTS = [f.path for f in os.scandir(SNAP_STUDENT_PATH) if f.is_dir()]
     SNAPSHOTS = [x for x in SNAPSHOTS if '.' not in x]
-    SNAPSHOTS = [s.replace(SNAP_PATH + '/', '') for s in SNAPSHOTS]
+    SNAPSHOTS = [s.replace(SNAP_STUDENT_PATH + '/', '') for s in SNAPSHOTS]
 
     # Error No Snapshots Found
     if not SNAPSHOTS:
@@ -217,7 +206,7 @@ def get_snapshot_list():
                 error='Not Found - No Snapshots Found',
                 message='Not Found - No Snapshot Directories Found.'),
                 404)
-				
+
     # Return List of Student Snapshots
     return (jsonify(SNAPSHOTS), 200)
 
@@ -226,7 +215,7 @@ def get_snapshot_list():
 # Curl Usage Command Examples For '/get_snapshot_file' API Call
 # Required Post Variables: STUDENT_ID, SNAPSHOT_NAME, SNAPSHOT_FILENAME
 # Required Header Variables: X-Api-Key
-# Example Respose: 
+# Example Respose: curl: Saved to filename 'subdir_file1.txt'
 #
 # curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" -d "SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
 # curl -OJ -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=12-08-2021" -F "SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
@@ -241,43 +230,43 @@ def get_snapshot_file():
     STUDENT_ID = request.form.get('STUDENT_ID')  # StudentID Post Variable
     SNAPSHOT_NAME = request.form.get('SNAPSHOT_NAME')  # Snapshot Name Variable
     SNAPSHOT_FILENAME = request.form.get('SNAPSHOT_FILENAME')  # Snapshot File Name Variable
-	
+
     SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
     SNAP_NAME_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_NAME  # Student Snapshot Path
-    SNAP_FILE_PATH = SNAP_DATE_PATH+'/'+SNAPSHOT_FILENAME  # Student Snapshot File Path
-    
+    SNAP_FILE_PATH = SNAP_NAME_PATH+'/'+SNAPSHOT_FILENAME  # Student Snapshot File Path
+
     SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
     SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
     SNAP_FILE_PATH_OBJ = Path(SNAP_FILE_PATH)  # Student Snapshot File Path Object
-	
+
     # Error if StudentID Post Variable Missing
     if not STUDENT_ID:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing STUDENT_ID Post Value.'
                 ), 406)
-    
+
     # Error if Snapshot Name Post Variable Missing
     if not SNAPSHOT_NAME:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing SNAPSHOT_NAME Post Value.'
                 ), 406)
-    
+
     # Error if Snapshot Directory Does Not Exist
     if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
                 error='Not Found - Snapshot Directory was Not Found',
                 message='Not Found - Student Snapshot Directory Not Found.'
                 ), 404)
-    
+
     # Error if Specfic Snapshot Does Not Exist
     if not (SNAP_NAME_PATH_OBJ.exists()
             and SNAP_NAME_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
                 error='Not Found - Snapshot was Not Found',
                 message='Not Found - Snapshot Not Found.'), 404)
-    
+
     # Error if Requested Snapshot File Does Not Exist
     if not (SNAP_FILE_PATH_OBJ.exists()
             and SNAP_FILE_PATH_OBJ.is_file()):
@@ -309,7 +298,7 @@ def get_snapshot_file():
 # Curl Usage Command Examples For '/get_snapshot_zip' API Call
 # Required Post Variables: STUDENT_ID, SNAPSHOT_NAME
 # Required Header Variables: X-Api-Key
-# Example Respose: 
+# Example Respose: curl: Saved to filename '31387714_12-08-2021.zip'
 #
 # curl -OJ -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_zip
 # curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_zip
@@ -322,29 +311,29 @@ def get_snapshot_zip():
 
     STUDENT_ID = request.form.get('STUDENT_ID')   # StudentID Post Variable
     SNAPSHOT_NAME = request.form.get('SNAPSHOT_NAME')  # Snapshot Name Variable
-	
+
     SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
-    SNAP_NAME_PATH = SNAP_PATH+'/'+SNAPSHOT_NAME  # Student Snapshot Path
+    SNAP_NAME_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_NAME  # Student Snapshot Path
     ZIP_FILE_NAME = STUDENT_ID+'_'+SNAPSHOT_NAME+'.zip' # Snapshot Zip File Name
-    
+
     SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
     SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
-    
-    
+
+
     # Error if StudentID Post Variable Missing
     if not STUDENT_ID:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing STUDENT_ID Post Value.'
                 ), 406)
-				
+
     # Error if Snapshot Name Post Variable Missing
     if not SNAPSHOT_NAME:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing SNAPSHOT_NAME Post Value.'
                 ), 406)
-				
+
     # Error if Student Snapshot Directory Does Not Exist
     if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
@@ -362,7 +351,7 @@ def get_snapshot_zip():
     # Create Zip File of Snapshot with Relative Path
     SNAP_FILE = io.BytesIO()  # Create Empty File In Memory
     with zf.ZipFile(SNAP_FILE, 'w') as SNAP_ZIP_FILE: # Open Empty File as Zip File Object for Writing
-        for (dirname, subdirs, files) in os.walk(SNAP_DATE_PATH + '/'): # Loop Thru Snapshot Files and Directories
+        for (dirname, subdirs, files) in os.walk(SNAP_NAME_PATH + '/'): # Loop Thru Snapshot Files and Directories
             SNAP_ZIP_FILE.write(dirname, dirname.replace(SNAPDIR, ''))  # Add Directory to Zip File Object
             for filename in files: # Loop Thru Each File in Snapshot Directory
                 SNAP_ZIP_FILE.write(os.path.join(dirname, filename),
@@ -373,7 +362,7 @@ def get_snapshot_zip():
     SNAP_FILE.seek(0) # Reset position of Snap Zip File to Begining
 
     response = make_response(SNAP_FILE.read())  # Includes the Zip File into the Response
-    response.headers.set('Content-Type', 'zip') # Sets the Response Content-Type to Zip File 
+    response.headers.set('Content-Type', 'zip') # Sets the Response Content-Type to Zip File
     response.headers.set('Content-Disposition', 'attachment',
                          filename='%s' % ZIP_FILE_NAME)  # Sets the Response Content-Disposition to Attachment and Incldes the File Name
 
@@ -385,7 +374,7 @@ def get_snapshot_zip():
 # Curl Usage Command Examples For '/put_student_report' API Call
 # Required Post Variables: STUDENT_ID, file (Pointer to Actual File)
 # Required Header Variables: X-Api-Key
-# Example Respose: 
+# Example Respose: "Success - File Uploaded - upload_test.txt"
 #
 # curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F UPLOAD_FILE=@upload_test.txt http://localhost:5000/put_student_report
 #
@@ -397,43 +386,43 @@ def put_student_report():
     STUDENT_ID = request.form.get('STUDENT_ID') # StudentID Post Variable
     FILE_DATA = request.files['UPLOAD_FILE']  # File Uploaded Data Post Variable
     FILE_NAME = secure_filename(FILE_DATA.filename)  # Name of File Uploaded Data
-	
+
     TEMP_FILE_NAME = uuid.uuid4().hex  # Unique Temp File Name
     STUDENT_PATH = HOMEDIR+STUDENT_ID  # Student Home Directory Path
     STUDENT_FILE_PATH = STUDENT_PATH+'/'+FILE_NAME  # Student Home File Path
-	
+
     STUDENT_PATH_OBJ = Path(STUDENT_PATH) # Student Home Directory Path Object
     STUDENT_FILE_PATH_OBJ = Path(STUDENT_FILE_PATH) # Student Uploaded File Path Object
-	
+
     # Error if StudentID Post Variable Missing
     if not STUDENT_ID:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing STUDENT_ID Post Value.'
                 ), 406)
-    
+
     # Error if No Data in UPLOAD_FILE Post Variable
     if not FILE_DATA:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing File Upload Post Data.'
                 ), 406)
-    
+
     # Error if No Filename for UPLOAD_FILE Post Variable
     if not FILE_NAME:
         return (jsonify(status=406,
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing File Name Value.'),
                 406)
-    
+
     # Error if Student Home Does Not Exist
     if not (STUDENT_PATH_OBJ.exists() and STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
                 error='Not Found - Student Directory Not Found',
                 message='Not Found - STUDENT_ID Home  Directory was Not Found.'
                 ), 404)
-    
-    # Error if File Already Exists In Student Home Directory 
+
+    # Error if File Already Exists In Student Home Directory
     if STUDENT_FILE_PATH_OBJ.exists():
         return (jsonify(status=417,
                 error='Expectation Failed - Uploaded File Already Exists'
@@ -457,7 +446,7 @@ def put_student_report():
     # Move & Rename File from Upload Directory with Temp Name to Student Home Directory with Actual Name
     shutil.move(os.path.join(app.config['UPLOAD_FOLDER'],
                 TEMP_FILE_NAME), STUDENT_FILE_PATH)
-				
+
     # Return Success Message
     return (jsonify('Success - File Uploaded - ' + FILE_NAME), 200)
 
