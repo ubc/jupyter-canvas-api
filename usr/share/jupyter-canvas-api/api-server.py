@@ -21,6 +21,7 @@ from pathlib import Path
 import shutil
 from werkzeug.utils import secure_filename
 import glob
+from waitress import serve
 
 __author__ = "Rahim Khoja"
 __credits__ = ["Rahim Khoja", "Balaji Srinivasarao", "Pan Luo"]
@@ -456,4 +457,5 @@ def put_student_report():
     return (jsonify('Success - File Uploaded - ' + FILE_NAME), 200)
 
 if __name__ == '__main__':
-    app.run(host=HOST, port=PORT, debug=DEBUG)
+    #app.run(host=HOST, port=PORT, debug=DEBUG)
+    serve(app, host=HOST, port=PORT)
