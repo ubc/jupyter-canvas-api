@@ -107,12 +107,6 @@ def get_snapshot_file_list():
     STUDENT_ID = request.form.get('STUDENT_ID')  # StudentID Post Variable
     SNAPSHOT_NAME = request.form.get('SNAPSHOT_NAME')  # Snapshot Name Variable
 
-    SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
-    SNAP_NAME_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_NAME  # Student Snapshot Path
-
-    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
-    SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
-
     # Error if StudentID Post Variable Missing
     if not STUDENT_ID:
         return (jsonify(status=406,
@@ -127,6 +121,12 @@ def get_snapshot_file_list():
                 message='Not Acceptable - Missing SNAPSHOT_NAME Post Value.'
                 ), 406)
 
+    SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
+    SNAP_NAME_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_NAME  # Student Snapshot Path
+
+    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
+    SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
+    
     # Error if Snapshot Directory Does Not Exist
     if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
@@ -176,10 +176,6 @@ def get_snapshot_list():
 
     STUDENT_ID = request.form.get('STUDENT_ID')  # StudentID Post Variable
 
-    SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
-
-    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
-
     # Error if StudentID Post Variable Missing
     if not STUDENT_ID:
         return (jsonify(status=406,
@@ -187,6 +183,10 @@ def get_snapshot_list():
                 message='Not Acceptable - Missing StudentID Post Value.'
                 ), 406)
 
+    SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
+
+    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
+    
     # Error if Snapshot Directory Does Not Exist
     if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
@@ -230,14 +230,6 @@ def get_snapshot_file():
     SNAPSHOT_NAME = request.form.get('SNAPSHOT_NAME')  # Snapshot Name Variable
     SNAPSHOT_FILENAME = request.form.get('SNAPSHOT_FILENAME')  # Snapshot File Name Variable
 
-    SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
-    SNAP_NAME_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_NAME  # Student Snapshot Path
-    SNAP_FILE_PATH = SNAP_NAME_PATH+'/'+SNAPSHOT_FILENAME  # Student Snapshot File Path
-
-    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
-    SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
-    SNAP_FILE_PATH_OBJ = Path(SNAP_FILE_PATH)  # Student Snapshot File Path Object
-
     # Error if StudentID Post Variable Missing
     if not STUDENT_ID:
         return (jsonify(status=406,
@@ -252,6 +244,21 @@ def get_snapshot_file():
                 message='Not Acceptable - Missing SNAPSHOT_NAME Post Value.'
                 ), 406)
 
+    # Error if Snapshot File Name Post Variable Missing
+    if not SNAPSHOT_FILENAME:
+        return (jsonify(status=406,
+                error='Not Acceptable - Missing Data',
+                message='Not Acceptable - Missing SNAPSHOT_FILENAME Post Value.'
+                ), 406)
+    
+    SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
+    SNAP_NAME_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_NAME  # Student Snapshot Path
+    SNAP_FILE_PATH = SNAP_NAME_PATH+'/'+SNAPSHOT_FILENAME  # Student Snapshot File Path
+
+    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
+    SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
+    SNAP_FILE_PATH_OBJ = Path(SNAP_FILE_PATH)  # Student Snapshot File Path Object
+    
     # Error if Snapshot Directory Does Not Exist
     if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
@@ -311,14 +318,6 @@ def get_snapshot_zip():
     STUDENT_ID = request.form.get('STUDENT_ID')   # StudentID Post Variable
     SNAPSHOT_NAME = request.form.get('SNAPSHOT_NAME')  # Snapshot Name Variable
 
-    SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
-    SNAP_NAME_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_NAME  # Student Snapshot Path
-    ZIP_FILE_NAME = STUDENT_ID+'_'+SNAPSHOT_NAME+'.zip' # Snapshot Zip File Name
-
-    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
-    SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
-
-
     # Error if StudentID Post Variable Missing
     if not STUDENT_ID:
         return (jsonify(status=406,
@@ -333,6 +332,13 @@ def get_snapshot_zip():
                 message='Not Acceptable - Missing SNAPSHOT_NAME Post Value.'
                 ), 406)
 
+    SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
+    SNAP_NAME_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_NAME  # Student Snapshot Path
+    ZIP_FILE_NAME = STUDENT_ID+'_'+SNAPSHOT_NAME+'.zip' # Snapshot Zip File Name
+
+    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
+    SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
+    
     # Error if Student Snapshot Directory Does Not Exist
     if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
@@ -386,13 +392,6 @@ def put_student_report():
     FILE_DATA = request.files['UPLOAD_FILE']  # File Uploaded Data Post Variable
     FILE_NAME = secure_filename(FILE_DATA.filename)  # Name of File Uploaded Data
 
-    TEMP_FILE_NAME = uuid.uuid4().hex  # Unique Temp File Name
-    STUDENT_PATH = HOMEDIR+STUDENT_ID  # Student Home Directory Path
-    STUDENT_FILE_PATH = STUDENT_PATH+'/'+FILE_NAME  # Student Home File Path
-
-    STUDENT_PATH_OBJ = Path(STUDENT_PATH) # Student Home Directory Path Object
-    STUDENT_FILE_PATH_OBJ = Path(STUDENT_FILE_PATH) # Student Uploaded File Path Object
-
     # Error if StudentID Post Variable Missing
     if not STUDENT_ID:
         return (jsonify(status=406,
@@ -414,6 +413,13 @@ def put_student_report():
                 message='Not Acceptable - Missing File Name Value.'),
                 406)
 
+    TEMP_FILE_NAME = uuid.uuid4().hex  # Unique Temp File Name
+    STUDENT_PATH = HOMEDIR+STUDENT_ID  # Student Home Directory Path
+    STUDENT_FILE_PATH = STUDENT_PATH+'/'+FILE_NAME  # Student Home File Path
+
+    STUDENT_PATH_OBJ = Path(STUDENT_PATH) # Student Home Directory Path Object
+    STUDENT_FILE_PATH_OBJ = Path(STUDENT_FILE_PATH) # Student Uploaded File Path Object
+    
     # Error if Student Home Does Not Exist
     if not (STUDENT_PATH_OBJ.exists() and STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
