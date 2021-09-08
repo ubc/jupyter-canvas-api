@@ -1,6 +1,6 @@
 [Unit]
 Description=JupyterHub API for UBC Instructors Service
-After=network.service jupyter-api.mount
+After=network.service mnt-efs.mount
 
 [Service]
 WorkingDirectory=/usr/share/jupyter-canvas-api
