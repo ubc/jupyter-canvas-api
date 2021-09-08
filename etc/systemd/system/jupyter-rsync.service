@@ -1,6 +1,6 @@
 [Unit]
 Description=Jupyter Hub Cluster Student Direcory Snapshot Creation and Update Script
-Wants=jupyter-rsync.timer
+Wants=network.service jupyter-rsync.timer
 
 [Service]
 Type=oneshot
