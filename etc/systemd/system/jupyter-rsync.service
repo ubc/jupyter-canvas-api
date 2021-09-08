@@ -1,0 +1,12 @@
+[Unit]
+Description=Jupyter Hub Cluster Student Direcory Snapshot Creation and Update Script
+Wants=jupyter-rsync.timer
+
+[Service]
+Type=oneshot
+ExecStart=/usr/share/chia-scripts/harvester_info.sh
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
