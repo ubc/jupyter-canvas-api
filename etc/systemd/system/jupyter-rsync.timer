@@ -1,0 +1,11 @@
+[Unit]
+Description=Timer for Jupyter Hub Cluster Student Direcory Snapshot Creation and Update Script
+Requires=jupyter-rsync.service
+
+[Timer]
+Unit=jupyter-rsync.service
+OnCalendar=hourly
+Persistent=true
+
+[Install]
+WantedBy=timers.target
