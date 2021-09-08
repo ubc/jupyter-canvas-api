@@ -4,7 +4,7 @@ Wants=network.service jupyter-rsync.timer
 
 [Service]
 Type=oneshot
-ExecStart=/usr/share/chia-scripts/harvester_info.sh
+ExecStart=/usr/local/bin/hourly-rsync.sh
 User=root
 Group=root
 
