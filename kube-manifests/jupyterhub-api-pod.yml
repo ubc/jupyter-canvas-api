@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    run: jupyterhub-api-app
+    app: jhub-api
+    organization: ubc
+
+  name: jupyterhub-api-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:     
+      run: jupyterhub-api-app
+      app: jhub-api
+      organization: ubc
+  strategy:
+   type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: jupyterhub-api-app
+        app: jhub-api
+        organization: ubc
+    spec:
+      containers:
+      - image: 533178462151.dkr.ecr.ca-central-1.amazonaws.com/jupyterhub-api-server:latest
+        name: jupyterhub-api-app
+        resources:
+         requests:
+          cpu: "400m"
+          memory: 1G
+         limits:
+          cpu: "400m"
+          memory: 1G 
+        ports:
+         - containerPort: 5000
+        volumeMounts:
+         - name: jupyterhub-efs
+           mountPath: /mnt
+      volumes:
+      - name: jupyterhub-efs
+        persistentVolumeClaim:
+         claimName: jupyterhub-api-pvc
+status: {}

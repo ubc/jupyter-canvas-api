@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jupyterhub-api-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: jupyterhub-api-sc
+  resources:
+    requests:
+      storage: 5Gi
