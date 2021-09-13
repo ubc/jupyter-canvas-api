@@ -60,5 +60,5 @@ EXPOSE 5000
 COPY . /
 RUN pip3 install -r /usr/share/jupyter-canvas-api/requirements.txt
 CMD [ "python3","-u","/usr/share/jupyter-canvas-api/api-server.py"]
-CMD chmod +x /usr/local/bin/hourly-rsync.sh
-WORKDIR /usr/share/jupyter-canvas-api
+RUN chmod +x /usr/local/bin/hourly-rsync.sh
+RUN mv /usr/local/bin/hourly-rsync.sh /etc/cron.hourly/
