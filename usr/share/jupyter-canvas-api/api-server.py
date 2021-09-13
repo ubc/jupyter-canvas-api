@@ -22,6 +22,11 @@ import shutil
 from werkzeug.utils import secure_filename
 import glob
 from waitress import serve
+import unicodedata
+import re
+import datetime
+import fcntl
+import sysrsync
 
 __author__ = "Rahim Khoja"
 __credits__ = ["Rahim Khoja", "Balaji Srinivasarao", "Pan Luo"]
@@ -37,9 +42,10 @@ PORT = int(os.getenv('JUPYTER_API_PORT', '5000'))  # API TCP Port Number
 HOST = str(os.getenv('JUPYTER_API_HOST', '0.0.0.0'))  # API TCP Address
 APIKEY = str(os.getenv('JUPYTER_API_KEY', '12345'))  # API Key Value
 
-SNAPDIR = '/mnt/efs/snap/'   # Instructor Snapshot Directory
-HOMEDIR = '/mnt/efs/home/'   # Home Directory Root
-INTSNAPDIR = ''   # Intermediary Snapshot Directory
+SNAPDIR = '/mnt/efs/stat-100a-snap/'   # Instructor Snapshot Directory
+HOMEDIR = '/mnt/efs/stat-100a-home/'   # Home Directory Root
+INTSNAPDIR = '/mnt/efs/stat-100a-internal/'   # Intermediary Snapshot Directory
+COURSECODE = 'STAT100a'  # The API Course Code
 UPLOAD_FOLDER = os.path.join('/tmp', 'uploads')   # Temporary Upload Folder
 ALLOWED_EXTENSIONS = set(['txt', 'html', 'htm', 'ipynb'])   # Allowed Upload File Types
 
@@ -58,6 +64,25 @@ if not os.path.isdir(UPLOAD_FOLDER):
     os.mkdir(UPLOAD_FOLDER)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER # Flask Upload Directory
+
+
+# Converts Strings into FileName Safe Values
+def slugify(value, allow_unicode=False):
+    """
+    Taken from https://github.com/django/django/blob/master/django/utils/text.py
+    Convert to ASCII if 'allow_unicode' is False. Convert spaces or repeated
+    dashes to single dashes. Remove characters that aren't alphanumerics,
+    underscores, or hyphens. Convert to lowercase. Also strip leading and
+    trailing whitespace, dashes, and underscores.
+    """
+    value = str(value)
+    if allow_unicode:
+        value = unicodedata.normalize('NFKC', value)
+    else:
+        value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
+    value = re.sub(r'[^\w\s-]', '', value.lower())
+    return re.sub(r'[-\s]+', '-', value).strip('-_')
+
 
 # Default Flask HTTP 401 Error
 @app.errorhandler(401)
@@ -127,7 +152,7 @@ def get_snapshot_file_list():
 
     SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
     SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
-    
+
     # Error if Snapshot Directory Does Not Exist
     if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
@@ -187,7 +212,7 @@ def get_snapshot_list():
     SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
 
     SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
-    
+
     # Error if Snapshot Directory Does Not Exist
     if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
@@ -251,7 +276,7 @@ def get_snapshot_file():
                 error='Not Acceptable - Missing Data',
                 message='Not Acceptable - Missing SNAPSHOT_FILENAME Post Value.'
                 ), 406)
-    
+
     SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
     SNAP_NAME_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_NAME  # Student Snapshot Path
     SNAP_FILE_PATH = SNAP_NAME_PATH+'/'+SNAPSHOT_FILENAME  # Student Snapshot File Path
@@ -259,7 +284,7 @@ def get_snapshot_file():
     SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
     SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
     SNAP_FILE_PATH_OBJ = Path(SNAP_FILE_PATH)  # Student Snapshot File Path Object
-    
+
     # Error if Snapshot Directory Does Not Exist
     if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
@@ -339,7 +364,7 @@ def get_snapshot_zip():
 
     SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
     SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
-    
+
     # Error if Student Snapshot Directory Does Not Exist
     if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
@@ -420,7 +445,7 @@ def put_student_report():
 
     STUDENT_PATH_OBJ = Path(STUDENT_PATH) # Student Home Directory Path Object
     STUDENT_FILE_PATH_OBJ = Path(STUDENT_FILE_PATH) # Student Uploaded File Path Object
-    
+
     # Error if Student Home Does Not Exist
     if not (STUDENT_PATH_OBJ.exists() and STUDENT_PATH_OBJ.is_dir()):
         return (jsonify(status=404,
@@ -455,6 +480,195 @@ def put_student_report():
 
     # Return Success Message
     return (jsonify('Success - File Uploaded - ' + FILE_NAME), 200)
+
+
+#
+# Curl Usage Command Examples For '/snapshot' API Call
+# Required Post Variables: STUDENT_ID, SNAPSHOT_NAME
+# Required Header Variables: X-Api-Key
+# Example Response:
+#
+# curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=Assignment-1-snap" http://localhost:5000/snapshot
+#
+@app.route('/snapshot', methods=['POST'])
+@requires_apikey
+def snapshot():
+    """ Create a Snapshot of the Specified Student's Home Directory with the Specfied Snapshot Name. """
+
+    STUDENT_ID = request.form.get('STUDENT_ID') # StudentID Post Variable
+    SNAPSHOT_NAME = request.form.get('SNAPSHOT_NAME') # SNAPSHOT_NAME Post Variable
+
+    DATE=datetime.datetime.now()  # Get Current Date
+    DATE=DATE.isoformat()  # Convert to ISO Format Date
+    DATE=DATE[0:10] # Trim Time from ISO Date
+
+    # Error if StudentID Post Variable Missing
+    if not STUDENT_ID:
+        return (jsonify(status=406,
+                error='Not Acceptable - Missing Data',
+                message='Not Acceptable - Missing STUDENT_ID Post Value.'
+                ), 406)
+
+    # Error if SNAPSHOT_NAME Post Variable Missing
+    if not SNAPSHOT_NAME:
+        return (jsonify(status=406,
+                error='Not Acceptable - Missing Data',
+                message='Not Acceptable - Missing SNAPSHOT_NAME Post Value.'
+                ), 406)
+
+
+    SNAPSHOT_NAME_CLEAN = slugify(SNAPSHOT_NAME) # Ensure The SNAPSHOT_NAME is a Safe Filename
+    SNAPSHOT_NAME_CLEAN = SNAPSHOT_NAME_CLEAN+'_'+DATE  # Add Date to SNAPSHOT_NAME_CLEAN
+
+    STUDENT_PATH = HOMEDIR+STUDENT_ID  # Student Home Directory Path
+    SNAP_STUDENT_PATH = SNAPDIR+STUDENT_ID  # Student Snapshot Directory Path
+    SNAP_NAME_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_NAME_CLEAN  # Student Snapshot Path
+    LOCKFILE = '/var/lock/'+COURSECODE+'_'+STUDENT_ID+'.lock'  # Lock File For Student
+    INTSNAP_STUDENT_PATH = INTSNAPDIR+STUDENT_ID
+
+
+    STUDENT_PATH_OBJ = Path(STUDENT_PATH) # Student Home Directory Path Object
+    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
+    SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
+
+    # Error if Student Home Does Not Exist
+    if not (STUDENT_PATH_OBJ.exists() and STUDENT_PATH_OBJ.is_dir()):
+        return (jsonify(status=404,
+                error='Not Found - Student Directory Not Found',
+                message='Not Found - STUDENT_ID Home Directory was Not Found.'
+                ), 404)
+
+    # Error if Student Snapshot Directory Does Not Exist
+    if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
+        return (jsonify(status=404,
+                error='Not Found - Snapshot Directory was Not Found',
+                message='Not Found - Student Snapshot Directory Not Found.'
+                ), 404)
+
+    # Error if Specific Snapshot Already Exists
+    if (SNAP_NAME_PATH_OBJ.exists()
+            and SNAP_NAME_PATH_OBJ.is_dir()):
+        return (jsonify(status=404,
+                error='Already Exists - Snapshot Name Already Exists',
+                message='Already Exists - Student Snapshot Already Exists.'), 404)
+
+    # Create FLOCK or Wait 2 Seconds
+    while True:
+        try:
+            LOCKFILE_OBJ = open(LOCKFILE, 'w+')  # Open Lock File, Create if Does Not Exist
+            fcntl.flock(LOCKFILE_OBJ, fcntl.LOCK_EX | fcntl.LOCK_NB)  # Create Non Blocking Exclusive Flock
+            break   #  Break Out of While Loop if no Errors
+        except:
+            time.sleep(2)
+
+    # RSYNC Student Home to Intermediate Snapshot Directory
+    sysrsync.run(source=STUDENT_PATH,
+             destination=INTSNAP_STUDENT_PATH,
+             sync_source_contents=True,
+             options=['-a' ,'-v' ,'-h' ,'-W', '--no-compress'])
+
+    # Move Int Snap to Final Snap Location with New Name
+    shutil.move(INTSNAP_STUDENT_PATH, SNAP_NAME_PATH)
+
+    # Unlock Flock
+    fcntl.flock(LOCKFILE_OBJ, fcntl.LOCK_UN)
+    LOCKFILE_OBJ.close()
+    os.remove(LOCKFILE)
+
+    # Return Success Message
+    return (jsonify('Success - Snapshot Created - '+SNAPSHOT_NAME_CLEAN+' for Student: '+STUDENT_ID), 200)
+
+
+#
+# Curl Usage Command Examples For '/snapshot_all' API Call
+# Required Post Variables: SNAPSHOT_NAME
+# Required Header Variables: X-Api-Key
+# Example Response:
+#
+# curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_NAME=assignment-1-snap-all" http://localhost:5000/snapshot_all
+# curl -X POST -H "X-Api-Key: 12345" -d "STUDENT_NAME=assignment-1-snap-all" http://localhost:5000/snapshot_all
+# curl -X POST -H "X-Api-Key: 12345" -data "STUDENT_NAME=assignment-1-snap-all" http://localhost:5000/snapshot_all
+#
+@app.route('/snapshot_all', methods=['POST'])
+@requires_apikey
+def snapshot_all():
+    """ Create a Snapshot of tll the Student's Home Directories with the Specfied Snapshot Name. """
+
+    SNAPSHOT_NAME = request.form.get('SNAPSHOT_NAME') # SNAPSHOT_NAME Post Variable
+
+    DATE=datetime.datetime.now()  # Get Current Date
+    DATE=DATE.isoformat()  # Convert to ISO Format Date
+    DATE=DATE[0:10] # Trim Time from ISO Date
+
+    # Error if SNAPSHOT_NAME Post Variable Missing
+    if not SNAPSHOT_NAME:
+        return (jsonify(status=406,
+                error='Not Acceptable - Missing Data',
+                message='Not Acceptable - Missing SNAPSHOT_NAME Post Value.'
+                ), 406)
+
+    # Get List of Directories in Student Snapshot Directory
+    STUDENTS = [f.path for f in os.scandir(HOMEDIR) if f.is_dir()]
+    STUDENTS = [x for x in STUDENTS if '.' not in x]
+    STUDENTS = [s.replace(HOMEDIR, '') for s in STUDENTS]
+
+    SNAPSHOT_NAME_CLEAN = slugify(SNAPSHOT_NAME) # Ensure The SNAPSHOT_NAME is a Safe Filename
+    SNAPSHOT_NAME_CLEAN = SNAPSHOT_NAME_CLEAN+'_'+DATE  # Add Date to SNAPSHOT_NAME_CLEAN
+
+    # Check All Students Snapshot Directories that the Snapshot Does Not Existse
+    for STUDENT in STUDENTS:
+        SNAP_STUDENT_PATH = SNAPDIR+STUDENT  # Student Snapshot Directory Path
+        SNAP_NAME_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_NAME_CLEAN  # Student Snapshot Path
+
+        SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
+        SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
+
+        # Error if Student Snapshot Directory Does Not Exist
+        if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
+            return (jsonify(status=404,
+                error='Not Found - Snapshot Directory was Not Found',
+                message='Not Found - Student ('+STUDENT+') Snapshot Directory Not Found.'
+                ), 404)
+
+        # Error if Specific Snapshot Already Exists
+        if (SNAP_NAME_PATH_OBJ.exists() and SNAP_NAME_PATH_OBJ.is_dir()):
+            return (jsonify(status=404,
+                error='Already Exists - Snapshot Name Already Exists',
+                message='Already Exists - Student ('+STUDENT+') Snapshot Already Exists.'), 404)
+
+    # Create Snapshots for All Students
+    for STUDENT in STUDENTS:
+        STUDENT_PATH = HOMEDIR+STUDENT  # Student Home Directory Path
+        SNAP_STUDENT_PATH = SNAPDIR+STUDENT  # Student Snapshot Directory Path
+        SNAP_NAME_PATH = SNAP_STUDENT_PATH+'/'+SNAPSHOT_NAME_CLEAN  # Student Snapshot Path
+        LOCKFILE = '/var/lock/'+COURSECODE+'_'+STUDENT+'.lock'  # Lock File For Student
+        INTSNAP_STUDENT_PATH = INTSNAPDIR+STUDENT
+
+        # Create FLOCK or Wait 2 Seconds
+        while True:
+            try:
+                LOCKFILE_OBJ = open(LOCKFILE, 'w+')  # Open Lock File, Create if Does Not Exist
+                fcntl.flock(LOCKFILE_OBJ, fcntl.LOCK_EX | fcntl.LOCK_NB)  # Create Non Blocking Exclusive Flock
+                break   #  Break Out of While Loop if no Errors
+            except:
+                time.sleep(2)
+
+        # RSYNC Student Home to Intermediate Snapshot Directory
+        sysrsync.run(source=STUDENT_PATH,
+                     destination=INTSNAP_STUDENT_PATH,
+                     sync_source_contents=True,
+                     options=['-a' ,'-v' ,'-h' ,'-W', '--no-compress'])
+
+        # Move Int Snap to Final Snap Location with New Name
+        shutil.move(INTSNAP_STUDENT_PATH, SNAP_NAME_PATH)
+
+        # Unlock Flock
+        fcntl.flock(LOCKFILE_OBJ, fcntl.LOCK_UN)
+        LOCKFILE_OBJ.close()
+        os.remove(LOCKFILE)
+
+    # Return Success Message
+    return (jsonify('Success - Snapshot Created - '+SNAPSHOT_NAME_CLEAN+' for All Students'), 200)
 
 if __name__ == '__main__':
     #app.run(host=HOST, port=PORT, debug=DEBUG)
