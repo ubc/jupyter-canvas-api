@@ -24,6 +24,7 @@ RUN APT_INSTALL="apt-get install -y " && \
 		wget \																						
 		git \	
 		curl \
+		rsync \
 		&& \																						
 # ======================================================================							
 # python3.6																							
