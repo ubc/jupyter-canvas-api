@@ -22,7 +22,8 @@ RUN APT_INSTALL="apt-get install -y " && \
 		apt-utils \																					
 		ca-certificates \																			
 		wget \																						
-		git \																						
+		git \	
+		curl \
 		&& \																						
 # ======================================================================							
 # python3.6																							
