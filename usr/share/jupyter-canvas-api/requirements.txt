@@ -2,3 +2,4 @@ flask
 pathlib
 werkzeug
 waitress
+sysrsync
