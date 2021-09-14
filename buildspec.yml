@@ -1,0 +1,37 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      docker: 18
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - echo "Attempting ECR Login"
+      - $(aws ecr get-login --no-include-email)
+      - echo "ECR Login Sucessful"
+      - echo "changing permissions on project directory"
+      - chmod 777 *
+      - echo "permissions changed"
+      - echo "skaffold installation"
+      - curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
+      - install skaffold /usr/local/bin/
+      - echo "Kube cluster config"
+      - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+      - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+      - aws configure set default.region us-east-1
+      - aws eks --region us-east-1 update-kubeconfig --name $KUBE_CLUSTER
+      - kubectl get pods
+ 
+   
+
+     
+ 
+
+  build:
+    commands:
+      - skaffold build
+      - echo "image pushed to the repo"
+      - echo "attempting to run the image"
+      - skaffold run
+      - echo "kubernetes deployment successful!!"

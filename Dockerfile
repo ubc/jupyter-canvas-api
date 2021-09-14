@@ -43,8 +43,8 @@ RUN APT_INSTALL="apt-get install -y " && \
 			setuptools \																			
 			&& \																					
 		$PIP_INSTALL \
-			Flask \																					
-			waitress \									
+#			Flask \																					
+#			waitress \									
 			requests \
 			psutil \																				
 			&& \
@@ -60,6 +60,7 @@ RUN APT_INSTALL="apt-get install -y " && \
 # showtime																							
 # ----------------------------------------------------------------------							
 EXPOSE 5000											
+RUN mkdir /mnt/efs
 COPY . /
 WORKDIR /usr/share/jupyter-canvas-api/
 RUN pip3 install -r /usr/share/jupyter-canvas-api/requirements.txt

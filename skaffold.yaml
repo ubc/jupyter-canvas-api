@@ -1,0 +1,17 @@
+apiVersion: skaffold/v1
+kind: Config
+metadata:
+  name: jupyter-canvas-api
+build:
+  tagPolicy:
+   dateTime:
+    format: "2006-01-02_15-04-05.999_UTC"
+    timezone: "UTC"
+  artifacts:
+  - image: 533178462151.dkr.ecr.ca-central-1.amazonaws.com/jupyterhub-api-server
+    docker:
+      dockerfile: Dockerfile
+deploy:
+  kubectl:
+    manifests:
+    - kube-manifests/jupyterhub-api-pod.yml
