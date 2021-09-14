@@ -16,7 +16,8 @@ RUN APT_INSTALL="apt-get install -y " && \
 # ======================================================================							
 # Apt Packages																								
 # ----------------------------------------------------------------------							
-	SYSTEM_PACKAGES=noninteractive $APT_INSTALL \													
+	SYSTEM_PACKAGES=noninteractive $APT_INSTALL \	
+	        software-properties-common \
 		build-essential \																			
 		apt-utils \																					
 		ca-certificates \																			
@@ -29,13 +30,7 @@ RUN APT_INSTALL="apt-get install -y " && \
 		python3-dev \																				
 		python3-distutils-extra \																	
 		python3-pip \
-		&& \																						
-# ======================================================================							
-# python3.6																							
-# ----------------------------------------------------------------------							
-	SYSTEM_PACKAGES=noninteractive $APT_INSTALL \													
-		software-properties-common \																
-		&& \																						
+		&& \																																										
 # ======================================================================							
 # config and cleanup																				
 # ----------------------------------------------------------------------							
@@ -43,7 +38,6 @@ RUN APT_INSTALL="apt-get install -y " && \
 	apt-get clean && \																				
 	apt-get autoremove && \																			
 	rm -rf /var/lib/apt/lists/* /tmp/* ~/*	
-
 # ======================================================================							
 # showtime																							
 # ----------------------------------------------------------------------							
