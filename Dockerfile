@@ -11,13 +11,12 @@ rm /etc/localtime && \
 ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
 dpkg-reconfigure -f noninteractive tzdata && \
 apt-get clean
-RUN APT_INSTALL="apt-get install -y " && \															
-	PIP_INSTALL="python3 -m pip install " && \														
+RUN APT_INSTALL="apt-get install -y " && \																													
 	apt-get update && \																				
 # ======================================================================							
-# tools																								
+# Apt Packages																								
 # ----------------------------------------------------------------------							
-	DEBIAN_FRONTEND=noninteractive $APT_INSTALL \													
+	SYSTEM_PACKAGES=noninteractive $APT_INSTALL \													
 		build-essential \																			
 		apt-utils \																					
 		ca-certificates \																			
@@ -26,28 +25,18 @@ RUN APT_INSTALL="apt-get install -y " && \
 		curl \
 		rsync \
 		vim \
+		python3 \																					
+		python3-dev \																				
+		python3-distutils-extra \																	
+		python3-pip \
 		&& \																						
 # ======================================================================							
 # python3.6																							
 # ----------------------------------------------------------------------							
-	DEBIAN_FRONTEND=noninteractive $APT_INSTALL \													
+	SYSTEM_PACKAGES=noninteractive $APT_INSTALL \													
 		software-properties-common \																
 		&& \																						
-	DEBIAN_FRONTEND=noninteractive $APT_INSTALL \													
-		python3.6 \																					
-		python3.6-dev \																				
-		python3-distutils-extra \																	
-		python3-pip && \																			
-		ln -s /usr/bin/python3.6 /usr/local/bin/python3 && \										
-		$PIP_INSTALL \																				
-			setuptools \																			
-			&& \																					
-		$PIP_INSTALL \
-			Flask \																					
-			waitress \									
-			requests \
-			psutil \																				
-			&& \
+
 # ======================================================================							
 # config and cleanup																				
 # ----------------------------------------------------------------------							
