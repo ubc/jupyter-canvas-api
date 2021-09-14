@@ -60,9 +60,10 @@ RUN APT_INSTALL="apt-get install -y " && \
 # showtime																							
 # ----------------------------------------------------------------------							
 EXPOSE 5000											
-COPY . /
+COPY usr/share/jupyter-canvas-api/api-server.py /usr/share/jupyter-canvas-api/api-server.py
+COPY usr/share/jupyter-canvas-api/requirements.txt /usr/share/jupyter-canvas-api/requirements.txt
+COPY usr/local/bin/hourly-rsync.sh /etc/cron.hourly/hourly-rsync.sh
+RUN chmod +x /etc/cron.hourly/hourly-rsync.sh
 WORKDIR /usr/share/jupyter-canvas-api/
 RUN pip3 install -r /usr/share/jupyter-canvas-api/requirements.txt
 CMD [ "python3","-u","/usr/share/jupyter-canvas-api/api-server.py"]
-RUN chmod +x /usr/local/bin/hourly-rsync.sh
-RUN mv /usr/local/bin/hourly-rsync.sh /etc/cron.hourly/
