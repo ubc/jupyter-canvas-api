@@ -36,7 +36,6 @@ RUN APT_INSTALL="apt-get install -y " && \
 	SYSTEM_PACKAGES=noninteractive $APT_INSTALL \													
 		software-properties-common \																
 		&& \																						
-
 # ======================================================================							
 # config and cleanup																				
 # ----------------------------------------------------------------------							
