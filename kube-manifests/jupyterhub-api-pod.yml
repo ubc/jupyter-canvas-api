@@ -39,7 +39,7 @@ spec:
          - containerPort: 5000
         volumeMounts:
          - name: jupyterhub-efs
-           mountPath: /mnt
+           mountPath: /mnt/efs
       volumes:
       - name: jupyterhub-efs
         persistentVolumeClaim:
