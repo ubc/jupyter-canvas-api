@@ -2,9 +2,9 @@
 # python	3.6 (apt)																	
 # docker build -t IMAGE_ID .
 # ======================================================================							
-FROM ubuntu:18.04																					
+FROM debian:buster-slim																					
 ENV LANG C.UTF-8																					
-ENV TZ 'America/Toronto'
+ENV TZ 'America/Vancouver'
 RUN echo $TZ > /etc/timezone && \
 apt-get update && apt-get install -y tzdata && \
 rm /etc/localtime && \
