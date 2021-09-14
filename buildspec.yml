@@ -8,7 +8,6 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - echo "Attempting ECR Login"
-      - $(aws ecr get-login --no-include-email)
       - echo "ECR Login Sucessful"
       - echo "changing permissions on project directory"
       - chmod 777 *
@@ -19,7 +18,9 @@ phases:
       - echo "Kube cluster config"
       - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
       - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-      - aws configure set default.region us-east-1
+      - echo "ecr login"
+      - aws ecr get-login-password --region ca-central-1 | docker login --username AWS --password-stdin 533178462151.dkr.ecr.ca-central-1.amazonaws.com
+      - aws configure set default.region ca-central-1
       - aws eks --region us-east-1 update-kubeconfig --name $KUBE_CLUSTER
       - kubectl get pods
  
