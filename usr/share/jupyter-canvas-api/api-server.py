@@ -383,12 +383,14 @@ def get_snapshot_zip():
     SNAP_FILE = io.BytesIO()  # Create Empty File In Memory
     with zf.ZipFile(SNAP_FILE, 'w') as SNAP_ZIP_FILE: # Open Empty File as Zip File Object for Writing
         for (dirname, subdirs, files) in os.walk(SNAP_NAME_PATH + '/'): # Loop Thru Snapshot Files and Directories
-            SNAP_ZIP_FILE.write(dirname, dirname.replace(SNAPDIR, ''))  # Add Directory to Zip File Object
-            for filename in files: # Loop Thru Each File in Snapshot Directory
-                    SNAP_ZIP_FILE.write(os.path.join(dirname, filename),
-                                        os.path.join(dirname,
-                                        filename).replace(SNAPDIR, ''),
-                                        zf.ZIP_DEFLATED) # Add Snapshot File To Zip File Object
+            if "/." not in dirname:
+                SNAP_ZIP_FILE.write(dirname, dirname.replace(SNAPDIR, ''))  # Add Directory to Zip File Object
+                for filename in files: # Loop Thru Each File in Snapshot Directory
+                    if "/." not in filename:
+                        SNAP_ZIP_FILE.write(os.path.join(dirname, filename),
+                                            os.path.join(dirname,
+                                            filename).replace(SNAPDIR, ''),
+                                            zf.ZIP_DEFLATED) # Add Snapshot File To Zip File Object
         SNAP_ZIP_FILE.close() # Finish Writing to Zip File Object
     SNAP_FILE.seek(0) # Reset position of Snap Zip File to Beginning
 
