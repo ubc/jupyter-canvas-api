@@ -1,9 +1,12 @@
 # -----------------------------------------------------------------------					
-# python	3.6 (apt)																	
+# UBC IT - CTLC - Jupyter Hub Course API for Instructors
+# Created By: Balaji Srinivasarao, Rahim Khoja, & Pan Luo
 # docker build -t IMAGE_ID .
 # ======================================================================							
+# Container Choice
 FROM debian:buster-slim																					
 ENV LANG C.UTF-8																					
+# TimeZone Settings
 ENV TZ 'America/Vancouver'
 RUN echo $TZ > /etc/timezone && \
 apt-get update && apt-get install -y tzdata && \
@@ -11,6 +14,7 @@ rm /etc/localtime && \
 ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
 dpkg-reconfigure -f noninteractive tzdata && \
 apt-get clean
+# Package Installation Command
 RUN APT_INSTALL="apt-get install -y " && \																													
 	apt-get update && \																				
 # ======================================================================							
@@ -32,14 +36,14 @@ RUN APT_INSTALL="apt-get install -y " && \
 		python3-pip \
 		&& \																																										
 # ======================================================================							
-# config and cleanup																				
+# Container Cleanup & Finalization																				
 # ----------------------------------------------------------------------							
 	ldconfig && \																					
 	apt-get clean && \																				
 	apt-get autoremove && \																			
 	rm -rf /var/lib/apt/lists/* /tmp/* ~/*	
 # ======================================================================							
-# showtime																							
+# Application Specific Commands																							
 # ----------------------------------------------------------------------							
 EXPOSE 5000											
 COPY usr/share/jupyter-canvas-api/api-server.py /usr/share/jupyter-canvas-api/api-server.py
