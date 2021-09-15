@@ -41,11 +41,11 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'   # API Debug
 PORT = int(os.getenv('JUPYTER_API_PORT', '5000'))  # API TCP Port Number
 HOST = str(os.getenv('JUPYTER_API_HOST', '0.0.0.0'))  # API TCP Address
 APIKEY = str(os.getenv('JUPYTER_API_KEY', '12345'))  # API Key Value
+HOMEDIR = str(os.getenv('JNOTE_HOME', '/mnt/efs/stat-100a-home/'))  # Home Directory Root
+SNAPDIR = str(os.getenv('JNOTE_SNAP', '/mnt/efs/stat-100a-snap/'))  # Instructor Snapshot Directory
+INTSNAPDIR = str(os.getenv('JNOTE_INTSNAP', '/mnt/efs/stat-100a-internal/'))  # Intermediary Snapshot Directory
+COURSECODE = str(os.getenv('JNOTE_COURSE_CODE', 'STAT100a'))  # The API Course Code
 
-SNAPDIR = '/mnt/efs/stat-100a-snap/'   # Instructor Snapshot Directory
-HOMEDIR = '/mnt/efs/stat-100a-home/'   # Home Directory Root
-INTSNAPDIR = '/mnt/efs/stat-100a-internal/'   # Intermediary Snapshot Directory
-COURSECODE = 'STAT100a'  # The API Course Code
 UPLOAD_FOLDER = os.path.join('/tmp', 'uploads')   # Temporary Upload Folder
 ALLOWED_EXTENSIONS = set(['txt', 'html', 'htm', 'ipynb'])   # Allowed Upload File Types
 
