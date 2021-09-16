@@ -43,6 +43,18 @@ spec:
                 key: jupyterhub-api-key
         - name: JNOTE_COURSE_CODE
           value: "STAT100a"
+        - name: DEBUG
+          value: TRUE
+        - name: JUPYTER_API_PORT
+          value: "5000"
+        - name: JUPYTER_API_HOST
+          value: "0.0.0.0"
+        - name: JNOTE_HOME
+          value: "/mnt/efs/stat-100a-home/"
+        - name: JNOTE_SNAP
+          value: "/mnt/efs/stat-100a-snap/"         
+        - name: JNOTE_INTSNAP
+          value: "/mnt/efs/stat-100a-internal/"   
         ports:
          - containerPort: 5000
         volumeMounts:
