@@ -26,9 +26,6 @@ spec:
         organization: ubc
     spec:
       containers:
-      - env:
-        - name: JUPYTER_API_KEY
-          value: "123456"
       - image: 533178462151.dkr.ecr.ca-central-1.amazonaws.com/jupyterhub-api-server:latest
         name: jupyterhub-api-app
         resources:
@@ -38,6 +35,9 @@ spec:
          limits:
           cpu: "300m"
           memory: 1G 
+        env:
+        - name: JUPYTER_API_KEY
+          value: "123456"
         ports:
          - containerPort: 5000
         volumeMounts:
