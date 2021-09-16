@@ -43,7 +43,8 @@ RUN APT_INSTALL="apt-get install -y " && \
 	apt-get autoremove && \																			
 	rm -rf /var/lib/apt/lists/* /tmp/* ~/*	
 # ======================================================================							
-# Application Specific Commands																							
+# Application Specific Commands				
+#
 # ----------------------------------------------------------------------							
 EXPOSE 5000											
 COPY usr/share/jupyter-canvas-api/api-server.py /usr/share/jupyter-canvas-api/api-server.py
