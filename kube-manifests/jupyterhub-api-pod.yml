@@ -37,7 +37,10 @@ spec:
           memory: 1G 
         env:
         - name: JUPYTER_API_KEY
-          value: "123456"
+          valueFrom: 
+             secretKeyRef:
+                name: jupyterhub-api-key
+                key: jupyterhub-api-key
         ports:
          - containerPort: 5000
         volumeMounts:
