@@ -30,9 +30,7 @@ RUN APT_INSTALL="apt-get install -y " && \
 		curl \
 		rsync \
 		vim \
-		python3 \																					
-		python3-dev \																				
-		python3-distutils-extra \																	
+		python3 \																																					
 		python3-pip \
 		&& \																																										
 # ======================================================================							
