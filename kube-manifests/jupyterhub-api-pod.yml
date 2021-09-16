@@ -26,9 +26,6 @@ spec:
         organization: ubc
     spec:
       containers:
-      - env:
-        - name: JUPYTER_API_KEY
-          value: "123456"
       - image: 533178462151.dkr.ecr.ca-central-1.amazonaws.com/jupyterhub-api-server:latest
         name: jupyterhub-api-app
         resources:
