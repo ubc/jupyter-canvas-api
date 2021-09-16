@@ -44,7 +44,7 @@ spec:
         - name: JNOTE_COURSE_CODE
           value: "STAT100a"
         - name: DEBUG
-          value: TRUE
+          value: "TRUE"
         - name: JUPYTER_API_PORT
           value: "5000"
         - name: JUPYTER_API_HOST
