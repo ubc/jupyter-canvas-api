@@ -41,6 +41,8 @@ spec:
              secretKeyRef:
                 name: jupyterhub-api-key
                 key: jupyterhub-api-key
+        - name: JNOTE_COURSE_CODE
+          value: "STAT100a"
         ports:
          - containerPort: 5000
         volumeMounts:
