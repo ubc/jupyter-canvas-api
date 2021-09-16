@@ -36,22 +36,38 @@ then
     exit 1
 fi
 
-
 # Variables
-HOMEDIR='/mnt/efs/home/'
-SNAPDIR='/mnt/efs/snap/'
-COURSE='STAT100a'
+if [[ -z "${JNOTE_HOME}" ]]; then
+  HOMEDIR="/mnt/efs/stat-100a-home/"
+else
+  HOMEDIR="${JNOTE_HOME}"
+fi
 
+if [[ -z "${JNOTE_INTSNAP}" ]]; then
+  SNAPDIR="/mnt/efs/stat-100a-internal/"
+else
+  SNAPDIR="${JNOTE_INTSNAP}"
+fi
+
+if [[ -z "${JNOTE_SNAP}" ]]; then
+  FINALSNAPDIR="/mnt/efs/stat-100a-snap/"
+else
+  FINALSNAPDIR="${JNOTE_SNAP}"
+fi
+
+if [[ -z "${JNOTE_COURSE_CODE}" ]]; then
+  COURSE="STAT100a"
+else
+  COURSE="${JNOTE_COURSE_CODE}"
+fi
 
 # Array of User Home Directories
 HOME_ARRAY=("${HOMEDIR}"/*/)          # This creates an array of the full paths to all subdirs
 HOME_ARRAY=("${HOME_ARRAY[@]%/}")     # This removes the trailing slash on each item
 HOME_ARRAY=("${HOME_ARRAY[@]##*/}")   # This gets rid of Path
 
-
 COUNT=0  # COUNT Variable To Loop Thru HOME_ARRAY
 RUNNING=1  # RUNNING Variable to Control While Loop
-
 
 while [ $RUNNING -eq 1 ]
 do
@@ -60,6 +76,10 @@ do
 
     # Create Home Directory Location String
     STUDENTHOME="${HOMEDIR}${HOME_ARRAY[${COUNT}]}"
+
+    # Create Final Snap Directory Location String
+    FINALSNAPHOME="${FINALSNAPDIR}${HOME_ARRAY[${COUNT}]}"
+
     echo ${STUDENTHOME}
     # Create the lockfile.
     touch $LOCKFILE
@@ -74,6 +94,10 @@ do
 
     else
         echo "Lock Aquired!"
+
+        # Create Final Snap Location Student Directory If Does Not Exist
+        # This is what creates the student Final Snap Locations
+        mkdir -p "${FINALSNAPHOME}" || true
 
         # RSYNC Command to Copy Directory
         rsync -avhW --no-compress "${STUDENTHOME}" "${SNAPDIR}"
