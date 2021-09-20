@@ -2,7 +2,7 @@
 
 ## Description
 
-An API to interact with the POC JupyterHub Cluster and Canvas for Instructors. 
+An API to interact with the file system hosting the JupyterHub home directories. It allows Instructors to Snapshot their Students Home Drives for deadlines via an API call. These Snapshots can be triggered via an API call initiaated from a Canvas Assignment deadline. Instructors can create multiple Snapshots with custom names for each student or sets of students. Instructors can retrieve the Snapshots via a ZIP file of the whole Snapshot or by specifing specfic files within the Snapshot. Instryctors can also Put grading reports into the Students Home Directory by an API call.
 
 ## Jupyter Hub Integration
 
@@ -36,10 +36,57 @@ This Post Variable holds a file being uploaded to the API. To pass files in
 
 ### API Curl Examples
 
+#### Get Snapshot List
+
+# curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714" http://localhost:5000/get_snapshot_list
+# curl -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" http://localhost:5000/get_snapshot_list
+# curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" http://localhost:5000/get_snapshot_list
+
+#### Get Snapshot File List
+
+# curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_file_list
+# curl -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_file_list
+# curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_file_list
+
+#### Get Snapshot Zip File
+
+# curl -OJ -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_zip
+# curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_zip
+# curl -OJ -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_zip
+
+#### Get Snapshot File
+
+# curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" -d "SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
+# curl -OJ -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=12-08-2021" -F "SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
+# curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021&SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
+# curl -OJ -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021&SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
+
+#### Upload File To Student Home Directory
+
+# curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F UPLOAD_FILE=@upload_test.txt http://localhost:5000/put_student_report
+
+#### Create Snapshot for Student
+
+# curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=Assignment-1-snap" http://localhost:5000/snapshot
+
+#### Create Snapshot for All Students
+
+# curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_NAME=assignment-1-snap-all" http://localhost:5000/snapshot_all
+# curl -X POST -H "X-Api-Key: 12345" -d "STUDENT_NAME=assignment-1-snap-all" http://localhost:5000/snapshot_all
+# curl -X POST -H "X-Api-Key: 12345" -data "STUDENT_NAME=assignment-1-snap-all" http://localhost:5000/snapshot_all
 
 ## Repo Files
 
 ## Enviroment Variables
+
+DEBUG (TRUE:BOOL)
+JUPYTER_API_PORT (5000:INT)
+JUPYTER_API_HOST (0.0.0.0:STRING)
+JUPYTER_API_KEY (12345:STRING)
+JNOTE_HOME (/mnt/efs/stat-100a-home/:STRING)
+JNOTE_SNAP (/mnt/efs/stat-100a-snap/:STRING)
+JNOTE_INTSNAP (/mnt/efs/stat-100a-internal/:STRING)
+JNOTE_COURSE_CODE (STAT100a:STRING)
 
 ## Docker Deployments
 
