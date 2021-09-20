@@ -54,7 +54,7 @@ Required Post Variables: **STUDENT_ID** [The Student's Canvas ID]
 
 Required Headers: **X-Api-Key** [The API Key is Provided by UBC IT]  
 Required Post Variables: **STUDENT_ID** [The Student's Canvas ID]  
-                         **SNAPSHOT_NAME** [The Name of the Snapshot]  
+&ensp;                         &ensp;**SNAPSHOT_NAME** [The Name of the Snapshot]  
 
 *In the following example(s) we will use an X-Api-Key of '12345', a Canvas Student ID of '31387714', a Snapshot Name of 'Assignment-1-Snap_12-08-2021', and a URL of https://localhost:5000*
 
