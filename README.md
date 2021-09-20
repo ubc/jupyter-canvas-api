@@ -49,6 +49,6 @@ This Post Variable holds a file being uploaded to the API. To pass files in
 
 ## Support
 
-As this is a Proof of Concept project no support is going to be provided unless you are an Instructor or UBC Staff member participating in the Cluster trial.
+As this is a Proof of Concept project no support is going to be provided unless you are an Instructor or UBC Staff member participating in the trial.
 
 That being said, feel free to contact Rahim Khoja <rahim.khoja@ubc.ca> in the offchance he feels like providing additional support.  
