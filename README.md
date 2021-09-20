@@ -41,23 +41,20 @@ Each API call also requires the API Key (), which will also be provided on an as
 
 #### Get Snapshot List
 
-Required Headers: **X-Api-Key** [The API Key is Provided by UBC IT]
+Required Headers: **X-Api-Key** [The API Key is Provided by UBC IT]  
+Required Post Variables: **STUDENT_ID** [The Student's Canvas ID]  
 
-Required Post Variables: **STUDENT_ID** [The Student's Canvas ID]
+*In the following example(s) we will use an X-Api-Key of '12345', a Canvas Student ID of '31387714', and a URL of https://localhost:5000*  
 
-*In the following example(s) we will use an X-Api-Key of '12345', a Canvas Student ID of '31387714', and a URL of https://localhost:5000*
-
-1. curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714" https://localhost:5000/get_snapshot_list
-2. curl -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" https://localhost:5000/get_snapshot_list
-3. curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" https://localhost:5000/get_snapshot_list
+1. curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714" https://localhost:5000/get_snapshot_list  
+2. curl -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" https://localhost:5000/get_snapshot_list  
+3. curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" https://localhost:5000/get_snapshot_list  
 
 #### Get Snapshot File List
 
-Required Headers: **X-Api-Key** [The API Key is Provided by UBC IT]
-
-Required Post Variables: **STUDENT_ID** [The Student's Canvas ID]
-
-                         **SNAPSHOT_NAME** [The Name of the Snapshot]
+Required Headers: **X-Api-Key** [The API Key is Provided by UBC IT]  
+Required Post Variables: **STUDENT_ID** [The Student's Canvas ID]  
+                         **SNAPSHOT_NAME** [The Name of the Snapshot]  
 
 *In the following example(s) we will use an X-Api-Key of '12345', a Canvas Student ID of '31387714', a Snapshot Name of 'Assignment-1-Snap_12-08-2021', and a URL of https://localhost:5000*
 
