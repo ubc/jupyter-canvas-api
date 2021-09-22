@@ -33,6 +33,7 @@ RUN APT_INSTALL="apt-get install -y " && \
 		python3 \																																					
 		python3-pip \
 		cron \
+		rsyslog \
 		&& \																																										
 # ======================================================================							
 # Container Cleanup & Finalization																				
