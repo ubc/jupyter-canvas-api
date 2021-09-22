@@ -109,16 +109,26 @@ This deployment has been tested on Ubuntu 20.04, however it should work with pre
 ```
 # Prep System
 sudo apt update 
-sudo apt install python3 python3-pip curl rsync 
+sudo apt install python3 python3-pip curl rsync git
 
 # Get This Repo
 cd /tmp
 git clone [This Repo]
+cd jupyter-canvas-api
+sudo mkdir /usr/share/jupyter-canvas-api/
 
 # Copy Files
+sudo cp usr/share/jupyter-canvas-api/api-server.py /usr/share/jupyter-canvas-api/api-server.py
+sudo cp usr/share/jupyter-canvas-api/requirements.txt /usr/share/jupyter-canvas-api/requirements.txt
+sudo cp usr/local/bin/hourly-rsync.sh /usr/local/bin/hourly-rsync.sh
+sudo chmod +x /usr/local/bin/hourly-rsync.sh
 
 # SystemD
 systemctl daemon-reload
+
+# Setup Python
+sudo pip3 install -r /usr/share/jupyter-canvas-api/requirements.txt
+
 
 ```
 
