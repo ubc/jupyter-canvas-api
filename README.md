@@ -121,10 +121,17 @@ sudo mkdir /usr/share/jupyter-canvas-api/
 sudo cp usr/share/jupyter-canvas-api/api-server.py /usr/share/jupyter-canvas-api/api-server.py
 sudo cp usr/share/jupyter-canvas-api/requirements.txt /usr/share/jupyter-canvas-api/requirements.txt
 sudo cp usr/local/bin/hourly-rsync.sh /usr/local/bin/hourly-rsync.sh
+sudo cp etc/systemd/system/jupyter-canvas-api.service /etc/systemd/system/jupyter-canvas-api.service
+sudo cp etc/systemd/system/jupyter-rsync.service /etc/systemd/system/jupyter-rsync.service
+sudo cp etc/systemd/system/jupyter-rsync.timer /etc/systemd/system/jupyter-rsync.timer
+sudo cp etc/systemd/system/mnt-efs.mount /etc/systemd/system/mnt-efs.mount
 sudo chmod +x /usr/local/bin/hourly-rsync.sh
 
 # SystemD
 systemctl daemon-reload
+systemctl enable jupyter-rsync.timer
+systemctl enable jupyter-canvas-api.service
+#systemctl enable mnt-efs.mount
 
 # Setup Python
 sudo pip3 install -r /usr/share/jupyter-canvas-api/requirements.txt
