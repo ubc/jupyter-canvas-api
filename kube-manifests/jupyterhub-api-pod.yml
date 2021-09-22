@@ -30,11 +30,11 @@ spec:
         name: jupyterhub-api-app
         resources:
          requests:
-          cpu: "300m"
-          memory: 1G
+          cpu: "500m"
+          memory: 2G
          limits:
-          cpu: "300m"
-          memory: 1G 
+          cpu: "500m"
+          memory: 2G 
         env:
         - name: JUPYTER_API_KEY
           valueFrom: 
