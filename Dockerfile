@@ -52,7 +52,10 @@ COPY usr/share/jupyter-canvas-api/requirements.txt /usr/share/jupyter-canvas-api
 COPY usr/local/bin/hourly-rsync.sh /etc/cron.hourly/hourly-rsync
 RUN mkdir /mnt/efs
 RUN chmod +x /etc/cron.hourly/hourly-rsync
-RUN service cron start
 WORKDIR /usr/share/jupyter-canvas-api/
 RUN pip3 install -r /usr/share/jupyter-canvas-api/requirements.txt
 CMD [ "python3","-u","/usr/share/jupyter-canvas-api/api-server.py"]
+# Create the log file to be able to run tail
+RUN touch /var/log/cron.log
+# Run the command on container startup
+CMD /etc/init.d/cron start && tail -f /var/log/cron.log
