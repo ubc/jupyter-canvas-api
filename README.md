@@ -8,33 +8,27 @@ An API to interact with the file system hosting the JupyterHub home directories.
 
 ## Canvas LTI Integration
 
-## API Useage
-
 ### Headers & Post Variables
 
-Header: X-Api-Key
+Header: *X-Api-Key*
 
 This is a security header that allows users to interact with the API. Generally speaking this should be 16 to 32 characters long.
 
-Post Variable: STUDENT_ID 
+Post Variable: *STUDENT_ID* 
 
 This POST variable is used to target a specfic student via many of the API Routes. This refers to the Canvas Student ID.
 
-Post Variable: SNAPSHOT_NAME
+Post Variable: *SNAPSHOT_NAME*
 
 This POST variable is represents a name of a student's home directories file system snapshot, it is used by many API routes when creating or accessing snapshots. 
 
-Post Varible: SNAPSHOT_FILENAME
+Post Varible: *SNAPSHOT_FILENAME*
 
-Post Variable: UPLOAD_FILE
+Post Variable: *UPLOAD_FILE*
 
 This Post Variable holds a file being uploaded to the API. To pass files in
 
-
-### API Routes
-
-
-### API Curl Examples
+### API Curl Usage Examples
 You must update the URI for the API call to the one provided by the Team responsible for managing the application.
 
 Each API call also requires the API Key (), which will also be provided on an as needed bases by the Team responsible for managing the application.
@@ -109,6 +103,24 @@ JNOTE_COURSE_CODE (STAT100a:STRING)
 ## Docker Deployments
 
 ## Virtual Machine Deployments
+
+This deployment has been tested on Ubuntu 20.04, however it should work with previos versions of Ubuntu and Debain.
+
+```
+# Prep System
+sudo apt update 
+sudo apt install python3 python3-pip curl rsync 
+
+# Get This Repo
+cd /tmp
+git clone [This Repo]
+
+# Copy Files
+
+# SystemD
+systemctl daemon-reload
+
+```
 
 ## Kubernetes Pod Deployments
 
