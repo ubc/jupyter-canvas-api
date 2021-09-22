@@ -109,11 +109,12 @@ This deployment has been tested on Ubuntu 20.04, however it should work with pre
 ```
 # Prep System
 sudo apt update 
+sudp apy upgrade
 sudo apt install python3 python3-pip curl rsync git
 
 # Get This Repo
 cd /tmp
-git clone [This Repo]
+git clone https://github.com/ubc/jupyter-canvas-api.git
 cd jupyter-canvas-api
 sudo mkdir /usr/share/jupyter-canvas-api/
 
@@ -131,15 +132,33 @@ sudo chmod +x /usr/local/bin/hourly-rsync.sh
 systemctl daemon-reload
 systemctl enable jupyter-rsync.timer
 systemctl enable jupyter-canvas-api.service
+# Update the following mount to fit your needs, or add the Jupyter Lab home directory mount point to /etc/fstab
 #systemctl enable mnt-efs.mount
 
 # Setup Python
 sudo pip3 install -r /usr/share/jupyter-canvas-api/requirements.txt
 
+# Add Enviroment Variables (Update These To Fit Your Needs)
+sudo echo 'JUPYTER_API_PORT="5000"' >> /etc/environment
+sudo echo 'JUPYTER_API_HOST="0.0.0.0"' >> /etc/environment
+sudo echo 'JUPYTER_API_KEY="12345"' >> /etc/environment      
+sudo echo 'JNOTE_HOME="/mnt/efs/stat-100a-home/"' >> /etc/environment
+sudo echo 'JNOTE_SNAP="/mnt/efs/stat-100a-snap/"' >> /etc/environment
+sudo echo 'JNOTE_INTSNAP="/mnt/efs/stat-100a-internal/"' >> /etc/environment
+sudo echo 'JNOTE_COURSE_CODE="STAT100a"' >> /etc/environment
 
+# Reboot
+sudo reboot now
 ```
 
 ## Kubernetes Pod Deployments
+
+## Notes
+
+- The API needs to be run as Root, as such the Enviroment Variables need to be accessable by Root.
+- On the Virtual Machine Deployment, the hourly rsync script is controlled by a SystemD Timer, rather than a cronjob.
+- On the docker/kubernetes deployment the hourly rsync script is controlled via cron. A script is placed into /etc/cron.hourly, and the /etc/crontab for that directory is triggered on the 17th minute. 
+- When running the API call /snapshot_all there is a 1 hour cool down. If run sooner, it can take along time to complete.
 
 ## Support
 
