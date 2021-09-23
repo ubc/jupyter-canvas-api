@@ -48,8 +48,8 @@ Required Post Variables:  <BR>
 
 ##### Example Response
 ```
-user@host:~$  curl -H "X-Api-Key: 1234567" -d "STUDENT_ID=31387714" a6b93f73156444bee9bcbb435a211afb-418493956.ca-central-1.elb.amazonaws.com:5000/get_snapshot_list
-["snap1-test","assignment-3-snap_2021-09-09","test-sept-21_2021-09-22","test-3-sept-21_2021-09-22","test-4_2021-09-22","test-1-sept-21_2021-09-22","snap3-test","test-flock-a_2021-09-09","assignment-1-snap_2021-09-09","snap2-test","test-all-sept-10_2021-09-10","test-2-sept-21_2021-09-22","test-flock-b_2021-09-09","assignment-6-snap_2021-09-09","assignment-60-snap_2021-09-09","assignment-2-snap_2021-09-09","test-all2-sept-10_2021-09-10","test-sept-10_2021-09-10"]
+user@host:~$  curl -H "X-Api-Key: 1234567" -d "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list
+["assignment-3_2021-09-09","assignment-2-snap_2021-09-09","assignment-1-snap_2021-09-09","flocking-test-snapshot-call_2021-09-09","assignment-6_2021-09-09","assignment-60_2021-09-09","exam_work_2021-09-10"]
 user@host:~$
 ``` 
 
