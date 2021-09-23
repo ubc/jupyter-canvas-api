@@ -38,16 +38,18 @@ Each API call also requires the API Key (), which will also be provided on an as
 Required Headers & Post Variables:  
 <table>
     <tr>
-        <td align="center">**X-Api-Key**</td>
-        <td align="center">Header Variable</td>
-        <td align="center">The API Key is Provided by UBC IT</td>
+        <td>__X-Api-Key__</td>
+        <td>Header Variable</td>
+        <td>The API Key is Provided by UBC IT</td>
     </tr>
+    <tr></tr>
     <tr>
-        <td align="center">**STUDENT_ID**</td>
-        <td align="center">Post Variable</td>
-        <td align="center">The Student's Canvas ID</td>
+        <td>__STUDENT_ID__</td>
+        <td>Post Variable</td>
+        <td>The Student's Canvas ID</td>
     </tr>
 </table>
+
  - **X-Api-Key** &ensp;&nbsp; [Header - The API Key is Provided by UBC IT]  
  - **STUDENT_ID** &ensp; [Post Variable - The Student's Canvas ID]   
  
