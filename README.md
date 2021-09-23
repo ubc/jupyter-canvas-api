@@ -33,7 +33,11 @@ You must update the URI for the API call to the one provided by the Team respons
 
 Each API call also requires the API Key (), which will also be provided on an as needed bases by the Team responsible for managing the application.
 
-### Get Snapshot List
+### Get Snapshot List ( https://{HOST}:{PORT}/get_snapshot_list )
+
+
+Retrieve a list of Snapshots for a specified Canvas student.
+
 
 #### Required Headers & Post Variables:
   
@@ -52,11 +56,13 @@ Each API call also requires the API Key (), which will also be provided on an as
 </table>
 
 
-*In the following example(s) we will use an __X-Api-Key__ of '12345', a __Student_ID__ of '31387714', and a URL of __https://api.example.com:5000__*  
+*In the following example(s) we will use an __X-Api-Key__ of '12345', a __Student_ID__ of '31387714', and a URL of __https://api.example.com:5000/get_snapshot_list__*  
+
 
 1. curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list  
 2. curl -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list  
 3. curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list  
+
 
 #### Example:
 ```
@@ -67,7 +73,11 @@ user@host:~$
 
 # 
 
-### Get Snapshot File List
+### Get Snapshot File List ( https://{HOST}:{PORT}/get_snapshot_file_list )
+
+
+Retrieve a list of files within the specified Canvas students' Snapshot.
+
 
 #### Required Headers & Post Variables:
   
@@ -92,11 +102,13 @@ user@host:~$
 </table>    
 
 
-*In the following example(s) we will use an __X-Api-Key__ of '12345', a __Student_ID__ of '31387714', a __SNAPSHOT_NAME__ of 'assignment-1_2021-09-09', and a URL of __https://api.example.com:5000__*  
+*In the following example(s) we will use an __X-Api-Key__ of '12345', a __Student_ID__ of '31387714', a __SNAPSHOT_NAME__ of 'assignment-1_2021-09-09', and a URL of __https://api.example.com:5000/get_snapshot_file_list__*  
+
 
 1. curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_file_list
 2. curl -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_file_list
 3. curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_file_list
+
 
 #### Example
 ```
@@ -219,14 +231,68 @@ user@host:~$
 
 ## Enviroment Variables
 
-DEBUG (TRUE:BOOL)
-JUPYTER_API_PORT (5000:INT)
-JUPYTER_API_HOST (0.0.0.0:STRING)
-JUPYTER_API_KEY (12345:STRING)
-JNOTE_HOME (/mnt/efs/stat-100a-home/:STRING)
-JNOTE_SNAP (/mnt/efs/stat-100a-snap/:STRING)
-JNOTE_INTSNAP (/mnt/efs/stat-100a-internal/:STRING)
-JNOTE_COURSE_CODE (STAT100a:STRING)
+<div>
+  <table>
+    <thead>
+      <tr>
+        <th>Enviroment Variable</th>
+        <th>Required</th>
+        <th>Default Value</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>DEBUG</td>
+        <td>[]</td>
+        <td>TRUE</td>
+        <td>Enables Dubug output within the API code</td>
+      </tr>
+      <tr>
+        <td>JUPYTER_API_PORT</td>
+        <td>[]</td>
+        <td>5000</td>
+        <td>The Port Number of the API</td>
+      </tr>
+      <tr>
+        <td>JUPYTER_API_HOST</td>
+        <td>[]</td>
+        <td>0.0.0.0</td>
+        <td>The IP the API is being served on</td>
+      </tr>
+      <tr>
+        <td>JUPYTER_API_KEY</td>
+        <td>[x]</td>
+        <td>12345</td>
+        <td>The API Key</td>
+      </tr>
+      <tr>
+        <td>JNOTE_HOME</td>
+        <td>[x]</td>
+        <td>{No Default Value}</td>
+        <td>The location of Jupyter Notebooks' user Home directory</td>
+      </tr>
+      <tr>
+        <td>JNOTE_SNAP</td>
+        <td>[x]</td>
+        <td>{No Default Value}</td>
+        <td>The location of Jupyter Notebooks final Snapshot directory</td>
+      </tr>
+      <tr>
+        <td>JNOTE_INTSNAP</td>
+        <td>[x]</td>
+        <td>{No Default Value}</td>
+        <td>The location of Jupyter Notebooks internal Snapshot directory</td>
+      </tr>
+      <tr>
+        <td>JNOTE_COURSE_CODE</td>
+        <td>[x]</td>
+        <td>{No Default Value}</td>
+        <td>The Course Code</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 ## Docker Deployments
 
