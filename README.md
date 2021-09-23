@@ -38,7 +38,7 @@ Each API call also requires the API Key (), which will also be provided on an as
 **Required Headers & Post Variables:**  
 <table>
     <tr>
-        <td> **X-Api-Key** </td>
+        <td> <strong>X-Api-Key</strong> </td>
         <td>Header Variable</td>
         <td>The API Key is Provided by UBC IT</td>
     </tr>
