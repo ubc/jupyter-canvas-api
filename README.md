@@ -244,49 +244,49 @@ user@host:~$
     <tbody>
       <tr>
         <td>DEBUG</td>
-        <td></td>
+        <td align="center"></td>
         <td>TRUE</td>
         <td>Enables Dubug output within the API code</td>
       </tr>
       <tr>
         <td>JUPYTER_API_PORT</td>
-        <td></td>
+        <td align="center"></td>
         <td>5000</td>
         <td>The Port Number of the API</td>
       </tr>
       <tr>
         <td>JUPYTER_API_HOST</td>
-        <td></td>
+        <td align="center"></td>
         <td>0.0.0.0</td>
         <td>The IP the API is being served on</td>
       </tr>
       <tr>
         <td>JUPYTER_API_KEY</td>
-        <td>&check; </td>
+        <td align="center">&check; </td>
         <td>12345</td>
         <td>The API Key</td>
       </tr>
       <tr>
         <td>JNOTE_HOME</td>
-        <td>&check; </td>
+        <td align="center">&check; </td>
         <td>{No Default Value}</td>
         <td>The location of Jupyter Notebooks' user Home directory</td>
       </tr>
       <tr>
         <td>JNOTE_SNAP</td>
-        <td>&check; </td>
+        <td align="center">&check; </td>
         <td>{No Default Value}</td>
         <td>The location of Jupyter Notebooks final Snapshot directory</td>
       </tr>
       <tr>
         <td>JNOTE_INTSNAP</td>
-        <td>&check; </td>
+        <td align="center">&check; </td>
         <td>{No Default Value}</td>
         <td>The location of Jupyter Notebooks internal Snapshot directory</td>
       </tr>
       <tr>
         <td>JNOTE_COURSE_CODE</td>
-        <td>&check; </td>
+        <td align="center">&check; </td>
         <td>{No Default Value}</td>
         <td>The Course Code</td>
       </tr>
