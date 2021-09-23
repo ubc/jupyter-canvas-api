@@ -99,10 +99,11 @@ user@host:~$
 #### Example
 ```
 user@host:~$  curl -H "X-Api-Key: 1234567" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_file_list
-["assignment-1.ipynb","assignment-2.ipynb","exercise-1.ipynb","practise/practise-1.ipynb","practise/practise-2.ipynb","assignment-1-grades.html"]
+["assignment-1.ipynb","assignment-2.ipynb","exercise-1.ipynb","practice/practice-1.ipynb","practice/practice-2.ipynb","assignment-1-grades.html"]
 user@host:~$
 ```
 
+# 
 
 ### Get Snapshot Zip File
 
@@ -128,7 +129,7 @@ user@host:~$
     </tr>
 </table>   
 
-*In the following example(s) we will use an __X-Api-Key__ of '12345', a __Student_ID__ of '31387714', a __SNAPSHOT_NAME__ of 'assignment-1_2021-09-09', and a URL of __https://api.example.com:5000__*  
+*In the following example(s) we will use an __X-Api-Key__ of '12345', a __Student_ID__ of '31387714', a __SNAPSHOT_NAME__ of 'assignment-1_2021-09-09', and a URL of __https://api.example.com:5000/get_snapshot_zip__*  
 
 #### Example
 ```
@@ -141,22 +142,68 @@ user@host:~$
 2. curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_zip
 3. curl -OJ -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_zip
 
-#### Get Snapshot File
+#
 
-1. curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" -d "SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
-2. curl -OJ -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=12-08-2021" -F "SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
-3. curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021&SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
-4. curl -OJ -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021&SNAPSHOT_FILENAME=subdir_test/subdir_file1.txt" http://localhost:5000/get_snapshot_file
+### Get Snapshot File
 
-#### Upload File To Student Home Directory
+#### Required Headers & Post Variables:
+  
+<table>
+    <tr>
+        <td><strong>X-Api-Key</strong></td>
+        <td>Header Variable</td>
+        <td>The API Key is Provided by UBC IT</td>
+    </tr>
+    <tr></tr>
+    <tr>
+        <td><strong>STUDENT_ID</strong></td>
+        <td>Post Variable</td>
+        <td>The Student's Canvas ID</td>
+    </tr>
+    <tr></tr>
+    <tr>
+        <td><strong>SNAPSHOT_NAME</strong></td>
+        <td>Post Variable</td>
+        <td>The Name of the Snapshot</td>
+    </tr>
+    <tr>
+        <td><strong>SNAPSHOT_FILENAME</strong></td>
+        <td>Post Variable</td>
+        <td>The Name and Location of the Snapshot file being downloaded</td>
+    </tr>
+</table>   
+
+*In the following example(s) we will use an __X-Api-Key__ of '12345', a __Student_ID__ of '31387714', a __SNAPSHOT_NAME__ of 'assignment-1_2021-09-09', a __SNAPSHOT_FILENAME__ of 'practice/practice-1.ipynb', and a URL of __https://api.example.com:5000/get_snapshot_file__*  
+
+1. curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" -d "SNAPSHOT_FILENAME=practice/practice-1.ipynb" https://api.example.com:5000/get_snapshot_file
+2. curl -OJ -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=12-08-2021" -F "SNAPSHOT_FILENAME=practice/practice-1.ipynb" https://api.example.com:5000/get_snapshot_file
+3. curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021&SNAPSHOT_FILENAME=practice/practice-1.ipynb" https://api.example.com:5000/get_snapshot_file
+4. curl -OJ -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021&SNAPSHOT_FILENAME=practice/practice-1.ipynb" https://api.example.com:5000/get_snapshot_file
+
+#### Example
+```
+user@host:~$  curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" -d "SNAPSHOT_FILENAME=practice/practice-1.ipynb" https://api.example.com:5000/get_snapshot_file
+curl: Saved to filename 'practice-1.ipynb'
+user@host:~$
+```
+
+
+# 
+
+### Upload File To Student Home Directory
 
 1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F UPLOAD_FILE=@upload_test.txt http://localhost:5000/put_student_report
 
-#### Create Snapshot for Student
+# 
+
+### Create Snapshot for Student
 
 1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=Assignment-1-snap" http://localhost:5000/snapshot
 
-#### Create Snapshot for All Students
+
+# 
+
+### Create Snapshot for All Students
 
 1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_NAME=assignment-1-snap-all" http://localhost:5000/snapshot_all
 2. curl -X POST -H "X-Api-Key: 12345" -d "STUDENT_NAME=assignment-1-snap-all" http://localhost:5000/snapshot_all
