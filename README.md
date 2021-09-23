@@ -36,6 +36,10 @@ Each API call also requires the API Key (), which will also be provided on an as
 #### Get Snapshot List
 
 Required Headers & Post Variables:  
+|   |   |
+|---|---|
+|__X-Api-Key__| Header - The API Key is Provided by UBC IT |
+|__STUDENT_ID__| Post Variable - The Student's Canvas ID |
  - **X-Api-Key** &ensp;&nbsp; [Header - The API Key is Provided by UBC IT]  
  - **STUDENT_ID** &ensp; [Post Variable - The Student's Canvas ID]   
  
