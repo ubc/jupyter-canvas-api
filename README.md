@@ -58,30 +58,46 @@ Each API call also requires the API Key (), which will also be provided on an as
 3. curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list  
 
 ##### Example:
-
-`user@host:~$  curl -H "X-Api-Key: 1234567" -d "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list`
-
-`["assignment-3_2021-09-09","assignment-2-snap_2021-09-09","assignment-1-snap_2021-09-09","flocking-test-call_2021-09-09","assignment-6_2021-09-09","exam_work_2021-09-10"]`
-
-`user@host:~$`
+```
+user@host:~$  curl -H "X-Api-Key: 1234567" -d "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list
+["assignment-3_2021-09-09","assignment-2_2021-09-09","assignment-1_2021-09-09","flocking-test-call_2021-09-09","exam_work_2021-09-10"]
+user@host:~$
+```
 
 
 #### Get Snapshot File List
 
-Required Headers & Post Variables:        
- - **X-Api-Key** &emsp;&ensp;[Header - The API Key is Provided by UBC IT]  
- - **STUDENT_ID** &emsp;&nbsp; [Post Variable - The Student's Canvas ID]                           
- - **SNAPSHOT_NAME** &ensp; [Post Variable - The Name of the Snapshot]  
+##### Required Headers & Post Variables:
+  
+<table>
+    <tr>
+        <td><strong>X-Api-Key</strong></td>
+        <td>Header Variable</td>
+        <td>The API Key is Provided by UBC IT</td>
+    </tr>
+    <tr></tr>
+    <tr>
+        <td><strong>STUDENT_ID</strong></td>
+        <td>Post Variable</td>
+        <td>The Student's Canvas ID</td>
+    </tr>
+    <tr></tr>
+    <tr>
+        <td><strong>SNAPSHOT_NAME</strong></td>
+        <td>Post Variable</td>
+        <td>The Name of the Snapshot</td>
+    </tr>
+</table>    
 
-*In the following example(s) we will use an X-Api-Key of '12345', a Canvas Student ID of '31387714', a Snapshot Name of 'Assignment-1_12-08-2021', and a URL of https://api.example.com:5000*  
+*In the following example(s) we will use an __X-Api-Key__ of '12345', a __Student_ID__ of '31387714', a __SNAPSHOT_NAME__ of 'assignment-1_2021-09-09', and a URL of __https://api.example.com:5000__*  
 
-1. curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=Assignment-1_12-08-2021" https://api.example.com:5000/get_snapshot_file_list
-2. curl -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=Assignment-1_12-08-2021" https://api.example.com:5000/get_snapshot_file_list
-3. curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=Assignment-1_12-08-2021" https://api.example.com:5000/get_snapshot_file_list
+1. curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_file_list
+2. curl -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_file_list
+3. curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_file_list
 
 ##### Example
 
-user@host:~$  curl -H "X-Api-Key: 1234567" -d "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list
+user@host:~$  curl -H "X-Api-Key: 1234567" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_file_list
 ["assignment-3_2021-09-09","assignment-2-snap_2021-09-09","assignment-1-snap_2021-09-09","flocking-test-snapshot-call_2021-09-09","assignment-6_2021-09-09","assignment-60_2021-09-09","exam_work_2021-09-10"]
 user@host:~$
  
