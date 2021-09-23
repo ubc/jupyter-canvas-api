@@ -233,7 +233,16 @@ user@host:~$
 </table>   
 
 
-1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F UPLOAD_FILE=@upload_test.txt http://localhost:5000/put_student_report
+1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "UPLOAD_FILE=@assignment-1-grades.html" https://api.example.com:5000/put_student_report
+2. curl -X POST -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "UPLOAD_FILE=@assignment-1-grades.html" https://api.example.com:5000/put_student_report
+3. curl -X POST -H "X-Api-Key: 12345" -data "STUDENT_ID=31387714&UPLOAD_FILE=@assignment-1-grades.html" https://api.example.com:5000/put_student_report
+
+#### Example
+```
+user@host:~$  curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "UPLOAD_FILE=@assignment-1-grades.html" https://api.example.com:5000/put_student_report
+Success - File Uploaded - assignment-1-grades.html
+user@host:~$
+```
 
 # 
 
