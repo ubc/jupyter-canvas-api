@@ -210,11 +210,57 @@ user@host:~$
 
 ### Upload File To Student Home Directory
 
+#### Required Headers & Post Variables:
+  
+<table>
+    <tr>
+        <td><strong>X-Api-Key</strong></td>
+        <td>Header Variable</td>
+        <td>The API Key is Provided by UBC IT</td>
+    </tr>
+    <tr></tr>
+    <tr>
+        <td><strong>STUDENT_ID</strong></td>
+        <td>Post Variable</td>
+        <td>The Student's Canvas ID</td>
+    </tr>
+    <tr></tr>
+    <tr>
+        <td><strong>UPLOAD_FILE</strong></td>
+        <td>Post Variable</td>
+        <td>The location and file to be uploaded, preceded by an @ symbol</td>
+    </tr>
+</table>   
+
+
 1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F UPLOAD_FILE=@upload_test.txt http://localhost:5000/put_student_report
 
 # 
 
 ### Create Snapshot for Student
+
+
+#### Required Headers & Post Variables:
+  
+<table>
+    <tr>
+        <td><strong>X-Api-Key</strong></td>
+        <td>Header Variable</td>
+        <td>The API Key is Provided by UBC IT</td>
+    </tr>
+    <tr></tr>
+    <tr>
+        <td><strong>STUDENT_ID</strong></td>
+        <td>Post Variable</td>
+        <td>The Student's Canvas ID</td>
+    </tr>
+    <tr></tr>
+    <tr>
+        <td><strong>SNAPSHOT_NAME</strong></td>
+        <td>Post Variable</td>
+        <td>The Name of the Snapshot</td>
+    </tr>
+</table>
 
 1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=Assignment-1-snap" http://localhost:5000/snapshot
 
@@ -222,6 +268,23 @@ user@host:~$
 # 
 
 ### Create Snapshot for All Students
+
+
+#### Required Headers & Post Variables:
+  
+<table>
+    <tr>
+        <td><strong>X-Api-Key</strong></td>
+        <td>Header Variable</td>
+        <td>The API Key is Provided by UBC IT</td>
+    </tr>
+    <tr></tr>
+    <tr>
+        <td><strong>SNAPSHOT_NAME</strong></td>
+        <td>Post Variable</td>
+        <td>The Name of the Snapshot</td>
+    </tr>
+</table>
 
 1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_NAME=assignment-1-snap-all" http://localhost:5000/snapshot_all
 2. curl -X POST -H "X-Api-Key: 12345" -d "STUDENT_NAME=assignment-1-snap-all" http://localhost:5000/snapshot_all
