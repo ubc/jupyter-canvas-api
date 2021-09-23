@@ -35,10 +35,10 @@ Each API call also requires the API Key (), which will also be provided on an as
 
 #### Get Snapshot List
 
-Required Headers: 
- - **X-Api-Key** [The API Key is Provided by UBC IT]  
-Required Post Variables: 
- - **STUDENT_ID** [The Student's Canvas ID]  
+Required Headers:  
+ - **X-Api-Key** [The API Key is Provided by UBC IT]  <BR>
+Required Post Variables:  <BR>
+ - **STUDENT_ID** [The Student's Canvas ID]   <BR>
  
 *In the following example(s) we will use an X-Api-Key of '12345', a Canvas Student ID of '31387714', and a URL of https://localhost:5000*  
 
@@ -46,11 +46,18 @@ Required Post Variables:
 2. curl -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" https://localhost:5000/get_snapshot_list  
 3. curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" https://localhost:5000/get_snapshot_list  
 
+##### Example Response
+```
+user@host:~$  curl -H "X-Api-Key: 1234567" -d "STUDENT_ID=31387714" a6b93f73156444bee9bcbb435a211afb-418493956.ca-central-1.elb.amazonaws.com:5000/get_snapshot_list
+["snap1-test","assignment-3-snap_2021-09-09","test-sept-21_2021-09-22","test-3-sept-21_2021-09-22","test-4_2021-09-22","test-1-sept-21_2021-09-22","snap3-test","test-flock-a_2021-09-09","assignment-1-snap_2021-09-09","snap2-test","test-all-sept-10_2021-09-10","test-2-sept-21_2021-09-22","test-flock-b_2021-09-09","assignment-6-snap_2021-09-09","assignment-60-snap_2021-09-09","assignment-2-snap_2021-09-09","test-all2-sept-10_2021-09-10","test-sept-10_2021-09-10"]
+user@host:~$
+``` 
+
 #### Get Snapshot File List
 
 Required Headers:        
- - **X-Api-Key** [The API Key is Provided by UBC IT]
-Required Post Variables:  
+ - **X-Api-Key** [The API Key is Provided by UBC IT]  
+Required Post Variables:   
  - **STUDENT_ID** [The Student's Canvas ID]                           
  - **SNAPSHOT_NAME** [The Name of the Snapshot]  
 
