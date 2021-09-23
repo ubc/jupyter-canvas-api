@@ -51,7 +51,7 @@ Each API call also requires the API Key (), which will also be provided on an as
     </tr>
 </table>
 
-*In the following example(s) we will use an X-Api-Key of '12345', a Student_ID of '31387714', and a URL of https://api.example.com:5000*  
+*In the following example(s) we will use an **X-Api-Key** of '12345', a **Student_ID** of '31387714', and a URL of **https://api.example.com:5000** *  
 
 1. curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list  
 2. curl -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list  
