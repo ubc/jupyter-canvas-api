@@ -96,11 +96,11 @@ user@host:~$
 3. curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_file_list
 
 ##### Example
-
+```
 user@host:~$  curl -H "X-Api-Key: 1234567" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_file_list
 ["assignment-3_2021-09-09","assignment-2-snap_2021-09-09","assignment-1-snap_2021-09-09","flocking-test-snapshot-call_2021-09-09","assignment-6_2021-09-09","assignment-60_2021-09-09","exam_work_2021-09-10"]
 user@host:~$
- 
+```
 
 #### Get Snapshot Zip File
 
