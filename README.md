@@ -35,7 +35,7 @@ Each API call also requires the API Key (), which will also be provided on an as
 
 #### Get Snapshot List
 
-**Required Headers & Post Variables:**  
+##### **Required Headers & Post Variables:**  
 <table>
     <tr>
         <td><strong>X-Api-Key</strong></td>
