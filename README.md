@@ -36,8 +36,8 @@ Each API call also requires the API Key (), which will also be provided on an as
 #### Get Snapshot List
 
 Required Headers & Post Variables:  
- - **X-Api-Key**   [Header - The API Key is Provided by UBC IT]  
- - **STUDENT_ID**  [Post Variable - The Student's Canvas ID]   
+ - **X-Api-Key**&nbsp;&nbsp;&nbsp;[Header - The API Key is Provided by UBC IT]  
+ - **STUDENT_ID**&nbsp;&nbsp;[Post Variable - The Student's Canvas ID]   
  
 *In the following example(s) we will use an X-Api-Key of '12345', a Canvas Student ID of '31387714', and a URL of https://api.example.com:5000*  
 
@@ -55,9 +55,9 @@ user@host:~$
 #### Get Snapshot File List
 
 Required Headers & Post Variables:        
- - **X-Api-Key**      [Header - The API Key is Provided by UBC IT]  
- - **STUDENT_ID**     [Post Variable - The Student's Canvas ID]                           
- - **SNAPSHOT_NAME**  [Post Variable - The Name of the Snapshot]  
+ - **X-Api-Key**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Header - The API Key is Provided by UBC IT]  
+ - **STUDENT_ID**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Post Variable - The Student's Canvas ID]                           
+ - **SNAPSHOT_NAME**&nbsp;&nbsp;[Post Variable - The Name of the Snapshot]  
 
 *In the following example(s) we will use an X-Api-Key of '12345', a Canvas Student ID of '31387714', a Snapshot Name of 'Assignment-1_12-08-2021', and a URL of https://api.example.com:5000*  
 
