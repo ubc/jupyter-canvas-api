@@ -58,11 +58,13 @@ Each API call also requires the API Key (), which will also be provided on an as
 3. curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list  
 
 ##### Example:
-```
+
 `user@host:~$  curl -H "X-Api-Key: 1234567" -d "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list`
+
 `["assignment-3_2021-09-09","assignment-2-snap_2021-09-09","assignment-1-snap_2021-09-09","flocking-test-call_2021-09-09","assignment-6_2021-09-09","exam_work_2021-09-10"]`
+
 `user@host:~$`
- ```
+
 
 #### Get Snapshot File List
 
@@ -78,11 +80,11 @@ Required Headers & Post Variables:
 3. curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=Assignment-1_12-08-2021" https://api.example.com:5000/get_snapshot_file_list
 
 ##### Example
-```
+
 user@host:~$  curl -H "X-Api-Key: 1234567" -d "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list
 ["assignment-3_2021-09-09","assignment-2-snap_2021-09-09","assignment-1-snap_2021-09-09","flocking-test-snapshot-call_2021-09-09","assignment-6_2021-09-09","assignment-60_2021-09-09","exam_work_2021-09-10"]
 user@host:~$
-``` 
+ 
 
 #### Get Snapshot Zip File
 
