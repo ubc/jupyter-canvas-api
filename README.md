@@ -35,10 +35,10 @@ Each API call also requires the API Key (), which will also be provided on an as
 
 #### Get Snapshot List
 
-Required Headers & Post Variables:  
+**Required Headers & Post Variables:**  
 <table>
     <tr>
-        <td>__X-Api-Key__</td>
+        <td><span style="font-weight:bold">X-Api-Key</span></td>
         <td>Header Variable</td>
         <td>The API Key is Provided by UBC IT</td>
     </tr>
@@ -50,9 +50,6 @@ Required Headers & Post Variables:
     </tr>
 </table>
 
- - **X-Api-Key** &ensp;&nbsp; [Header - The API Key is Provided by UBC IT]  
- - **STUDENT_ID** &ensp; [Post Variable - The Student's Canvas ID]   
- 
 *In the following example(s) we will use an X-Api-Key of '12345', a Canvas Student ID of '31387714', and a URL of https://api.example.com:5000*  
 
 1. curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list  
