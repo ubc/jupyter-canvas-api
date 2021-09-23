@@ -51,6 +51,7 @@ Each API call also requires the API Key (), which will also be provided on an as
     </tr>
 </table>
 
+
 *In the following example(s) we will use an __X-Api-Key__ of '12345', a __Student_ID__ of '31387714', and a URL of __https://api.example.com:5000__*  
 
 1. curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list  
@@ -89,6 +90,7 @@ user@host:~$
         <td>The Name of the Snapshot</td>
     </tr>
 </table>    
+
 
 *In the following example(s) we will use an __X-Api-Key__ of '12345', a __Student_ID__ of '31387714', a __SNAPSHOT_NAME__ of 'assignment-1_2021-09-09', and a URL of __https://api.example.com:5000__*  
 
@@ -129,18 +131,20 @@ user@host:~$
     </tr>
 </table>   
 
+
 *In the following example(s) we will use an __X-Api-Key__ of '12345', a __Student_ID__ of '31387714', a __SNAPSHOT_NAME__ of 'assignment-1_2021-09-09', and a URL of __https://api.example.com:5000/get_snapshot_zip__*  
+
+1. curl -OJ -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_zip
+2. curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_zip
+3. curl -OJ -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_zip
 
 #### Example
 ```
-user@host:~$  curl -H "X-Api-Key: 1234567" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_file_list
-["assignment-3_2021-09-09","assignment-2-snap_2021-09-09","assignment-1-snap_2021-09-09","flocking-test-snapshot-call_2021-09-09","assignment-6_2021-09-09","assignment-60_2021-09-09","exam_work_2021-09-10"]
+user@host:~$  curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_zip
+curl: Saved to filename '31387714_assignment-1_2021-09-09.zip'
 user@host:~$
 ```
 
-1. curl -OJ -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_zip
-2. curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_zip
-3. curl -OJ -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_zip
 
 #
 
@@ -166,12 +170,14 @@ user@host:~$
         <td>Post Variable</td>
         <td>The Name of the Snapshot</td>
     </tr>
+    <tr></tr>
     <tr>
         <td><strong>SNAPSHOT_FILENAME</strong></td>
         <td>Post Variable</td>
         <td>The Name and Location of the Snapshot file being downloaded</td>
     </tr>
 </table>   
+
 
 *In the following example(s) we will use an __X-Api-Key__ of '12345', a __Student_ID__ of '31387714', a __SNAPSHOT_NAME__ of 'assignment-1_2021-09-09', a __SNAPSHOT_FILENAME__ of 'practice/practice-1.ipynb', and a URL of __https://api.example.com:5000/get_snapshot_file__*  
 
