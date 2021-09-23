@@ -35,18 +35,17 @@ Each API call also requires the API Key (), which will also be provided on an as
 
 #### Get Snapshot List
 
-Required Headers:  
- - **X-Api-Key** [The API Key is Provided by UBC IT]  <BR>
-Required Post Variables:  <BR>
- - **STUDENT_ID** [The Student's Canvas ID]   <BR>
+Required Headers & Post Variables:  
+ - **X-Api-Key** [Header - The API Key is Provided by UBC IT]  
+ - **STUDENT_ID** [Post Variable - The Student's Canvas ID]   
  
-*In the following example(s) we will use an X-Api-Key of '12345', a Canvas Student ID of '31387714', and a URL of https://localhost:5000*  
+*In the following example(s) we will use an X-Api-Key of '12345', a Canvas Student ID of '31387714', and a URL of https://api.example.com:5000*  
 
-1. curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714" https://localhost:5000/get_snapshot_list  
-2. curl -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" https://localhost:5000/get_snapshot_list  
-3. curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" https://localhost:5000/get_snapshot_list  
+1. curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list  
+2. curl -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list  
+3. curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list  
 
-##### Example Response
+##### Example
 ```
 user@host:~$  curl -H "X-Api-Key: 1234567" -d "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list
 ["assignment-3_2021-09-09","assignment-2-snap_2021-09-09","assignment-1-snap_2021-09-09","flocking-test-snapshot-call_2021-09-09","assignment-6_2021-09-09","assignment-60_2021-09-09","exam_work_2021-09-10"]
