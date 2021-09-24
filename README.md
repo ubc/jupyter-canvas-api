@@ -4,37 +4,50 @@
 
 An API to interact with the file system hosting the JupyterHub home directories. It allows Instructors to Snapshot their Students Home Drives for deadlines via an API call. These Snapshots can be triggered via an API call initiaated from a Canvas Assignment deadline. Instructors can create multiple Snapshots with custom names for each student or sets of students. Instructors can retrieve the Snapshots via a ZIP file of the whole Snapshot or by specifing specfic files within the Snapshot. Instryctors can also Put grading reports into the Students Home Directory by an API call.
 
-## Jupyter Hub Integration
-
-## Canvas LTI Integration
 
 ### Headers & Post Variables
 
-Header: *X-Api-Key*
+<div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td><strong>X-Api-Key</strong></td>
+        <td>Request Header</td>
+        <td>This is a security header that allows users to interact with the API. Generally speaking this should be 16 to 32 characters long.</td>
+    </tr>
+    <tr></tr>
+    <tr>
+        <td><strong>STUDENT_ID</strong></td>
+        <td>Post Request Variable</td>
+        <td>This POST variable value represents a name of a Student Canvas ID.</td>
+    </tr>
+    <tr>
+        <td><strong>SNAPSHOT_NAME</strong></td>
+        <td>Post Request Variable</td>
+        <td>This POST variable value represents a name of a Snapshot</td>
+    </tr>
+    <tr>
+        <td><strong>SNAPSHOT_FILENAME</strong></td>
+        <td>Post Request Variable</td>
+        <td>This POST variable value represents a the name of a file within a Snapshot.</td>
+    </tr>
+    <tr>
+        <td><strong>UPLOAD_FILE</strong></td>
+        <td>Binary Post Request Variable</td>
+        <td>This Binary POST variable value contains the file being uploaded to the API.</td>
+    </tr>
+</table>
 
-This is a security header that allows users to interact with the API. Generally speaking this should be 16 to 32 characters long.
-
-Post Variable: *STUDENT_ID* 
-
-This POST variable is used to target a specfic student via many of the API Routes. This refers to the Canvas Student ID.
-
-Post Variable: *SNAPSHOT_NAME*
-
-This POST variable is represents a name of a student's home directories file system snapshot, it is used by many API routes when creating or accessing snapshots. 
-
-Post Varible: *SNAPSHOT_FILENAME*
-
-Post Variable: *UPLOAD_FILE*
-
-This Post Variable holds a file being uploaded to the API. To pass files in
-
-## API Curl Usage Examples
-You must update the URI for the API call to the one provided by the Team responsible for managing the application.
-
-Each API call also requires the API Key (), which will also be provided on an as needed bases by the Team responsible for managing the application.
+## API Examples
 
 ### Get Snapshot List
-
 
 Retrieve a list of Snapshots for a specified Canvas student.
 
@@ -427,6 +440,10 @@ Creates a Snapshot of the all students home directories with a common name, with
   </table>
 </div>
 
+## Jupyter Hub Integration
+
+## Canvas LTI Integration
+  
 ## Docker Deployments
 
 ## Virtual Machine Deployments
@@ -483,7 +500,7 @@ sudo reboot now
 ## Notes
 
 - The API needs to be run as Root, as such the Enviroment Variables need to be accessable by Root.
-- On the Virtual Machine Deployment, the hourly rsync script is controlled by a SystemD Timer, rather than a cronjob.
+- On the Virtual Machine Deployment, the hourly rsync script is controlled by a SystemD Timer, rather than a cronjob. It should be simple to move back if desired.
 - On the docker/kubernetes deployment the hourly rsync script is controlled via cron. A script is placed into /etc/cron.hourly, and the /etc/crontab for that directory is triggered on the 17th minute. 
 - When running the API call /snapshot_all there is a 1 hour cool down. If run sooner, it can take along time to complete.
 
