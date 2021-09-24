@@ -43,6 +43,11 @@ An API to interact with the file system hosting the JupyterHub home directories.
         <td>Binary Post Request Variable</td>
         <td>This Binary POST variable value contains the file being uploaded to the API.</td>
     </tr>
+    <tr>
+        <td><strong>Content-Disposition</strong></td>
+        <td>Response Header Variable & Data</td>
+        <td>This Header response variable value contains the filename of file binary data being sent by the API. The request data contains the files binary data.</td>
+    </tr>
 </table>
 
 ## API Examples
@@ -331,13 +336,19 @@ user@host:~$
     </tr>
 </table>
 
+#### Curl Command Call Examples:
+  
 *In the following example(s) we will use HEADER vairiable __X-Api-Key__ with a value of '12345', a __Student_ID__ POST variable with a value of '31387714',  a __SNAPSHOT_NAME__ POST variable with a value of 'Assignment-1', and a URL of __https://api.example.com:5000/snapshot__*  
-
 
 1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=Assignment-1" https://api.example.com:5000/snapshot
 2. curl -X POST -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=Assignment-1" https://api.example.com:5000/snapshot
 3. curl -X POST -H "X-Api-Key: 12345" -data "STUDENT_ID=31387714&SNAPSHOT_NAME=Assignment-1" https://api.example.com:5000/snapshot
 
+```
+user@host:~$  curl -X POST -H "X-Api-Key: 12345" -data "STUDENT_ID=31387714&SNAPSHOT_NAME=Assignment-1" https://api.example.com:5000/snapshot
+"Success - Snapshot Created - assignment-1_2021-09-01 for Student: 31387714"
+user@host:~$
+```
 
 # 
 
@@ -369,12 +380,21 @@ Creates a Snapshot of the all students home directories with a common name, with
     </tr>
 </table>
 
-1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_NAME=assignment-1-snap-all" http://localhost:5000/snapshot_all
-2. curl -X POST -H "X-Api-Key: 12345" -d "STUDENT_NAME=assignment-1-snap-all" http://localhost:5000/snapshot_all
-3. curl -X POST -H "X-Api-Key: 12345" -data "STUDENT_NAME=assignment-1-snap-all" http://localhost:5000/snapshot_all
+#### Curl Command Call Examples:
 
-## Repo Files
+*In the following example(s) we will use HEADER vairiable __X-Api-Key__ with a value of '12345', a __SNAPSHOT_NAME__ POST variable with a value of 'assignment-1-all', and a URL of __https://api.example.com:5000/snapshot_all__*  
+  
+1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_NAME=assignment-1-all" https://api.example.com:5000/snapshot_all
+2. curl -X POST -H "X-Api-Key: 12345" -d "STUDENT_NAME=assignment-1-all" https://api.example.com:5000/snapshot_all
+3. curl -X POST -H "X-Api-Key: 12345" -data "STUDENT_NAME=assignment-1-all" https://api.example.com:5000/snapshot_all
 
+```
+user@host:~$  curl -X POST -H "X-Api-Key: 12345" -d "STUDENT_NAME=assignment-1-all" https://api.example.com:5000/snapshot_all
+"Success - Snapshot Created - assignment-1-all_2021-09-01 for All Students"
+user@host:~$
+```
+
+  
 ## Enviroment Variables
 
 <div>
@@ -440,6 +460,9 @@ Creates a Snapshot of the all students home directories with a common name, with
   </table>
 </div>
 
+  
+## Repo Files
+  
 ## Jupyter Hub Integration
 
 ## Canvas LTI Integration
@@ -448,7 +471,7 @@ Creates a Snapshot of the all students home directories with a common name, with
 
 ## Virtual Machine Deployments
 
-This deployment has been tested on Ubuntu 20.04, however it should work with previos versions of Ubuntu and Debain.
+*This deployment has been tested on Ubuntu 20.04, however it should work with previos versions of Ubuntu and Debain.*
 
 ```
 # Prep System
