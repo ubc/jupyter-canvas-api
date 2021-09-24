@@ -33,11 +33,14 @@ You must update the URI for the API call to the one provided by the Team respons
 
 Each API call also requires the API Key (), which will also be provided on an as needed bases by the Team responsible for managing the application.
 
-### Get Snapshot List ( https://{HOST}:{PORT}/get_snapshot_list )
+### Get Snapshot List
 
 
 Retrieve a list of Snapshots for a specified Canvas student.
 
+*API URI:* https://{HOST}:{PORT}/get_snapshot_list
+
+*API Return HTTP Codes: 200 for Success with a POST Response, 
 
 #### Required Headers & Post Variables:
   
@@ -78,6 +81,12 @@ user@host:~$
 
 Retrieve a list of files within the specified Canvas students' Snapshot.
 
+##### API URI:* https://{HOST}:{PORT}/get_snapshot_file_list
+
+##### API Return HTTP Codes:
+- *200* on Success with a POST Response
+- *406* Failure Missing Data, with a POST Response.
+- *404* Failure No Snapshot Directory with a POST Response.
 
 #### Required Headers & Post Variables:
   
