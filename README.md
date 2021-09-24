@@ -232,6 +232,7 @@ user@host:~$
     </tr>
 </table>   
 
+*In the following example(s) we will use HEADER vairiable __X-Api-Key__ with a value of '12345', a __Student_ID__ POST variable with a value of '31387714', a Post variable called __UPLOAD_FILE__ with a binary value of a file '@/some/place/assignment-1-grades.html', and a URL of __https://api.example.com:5000/put_student_report__*  
 
 1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "UPLOAD_FILE=@assignment-1-grades.html" https://api.example.com:5000/put_student_report
 2. curl -X POST -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "UPLOAD_FILE=@assignment-1-grades.html" https://api.example.com:5000/put_student_report
@@ -271,7 +272,12 @@ user@host:~$
     </tr>
 </table>
 
-1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=Assignment-1-snap" http://localhost:5000/snapshot
+*In the following example(s) we will use HEADER vairiable __X-Api-Key__ with a value of '12345', a __Student_ID__ POST variable with a value of '31387714',  a __SNAPSHOT_NAME__ POST variable with a value of 'Assignment-1', and a URL of __https://api.example.com:5000/snapshot__*  
+
+
+1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=Assignment-1" https://api.example.com:5000/snapshot
+2. curl -X POST -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=Assignment-1" https://api.example.com:5000/snapshot
+3. curl -X POST -H "X-Api-Key: 12345" -data "STUDENT_ID=31387714&SNAPSHOT_NAME=Assignment-1" https://api.example.com:5000/snapshot
 
 
 # 
