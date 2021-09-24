@@ -38,9 +38,12 @@ Each API call also requires the API Key (), which will also be provided on an as
 
 Retrieve a list of Snapshots for a specified Canvas student.
 
-*API URI:* https://{HOST}:{PORT}/get_snapshot_list
+##### API URI: https://{HOST}:{PORT}/get_snapshot_list
 
-*API Return HTTP Codes: 200 for Success with a POST Response, 
+##### API Return HTTP Codes: 
+- *200* for Success with a POST Response, 
+- *404* Failure Not Found with a POST Response.
+
 
 #### Required Headers & Post Variables:
   
@@ -58,16 +61,15 @@ Retrieve a list of Snapshots for a specified Canvas student.
     </tr>
 </table>
 
+#### Curl Command Call Examples:
 
-*In the following example(s) we will use an __X-Api-Key__ of '12345', a __Student_ID__ of '31387714', and a URL of __https://api.example.com:5000/get_snapshot_list__*  
-
+*In the following example(s) we will use HEADER vairiable __X-Api-Key__ with a value of '12345', and a __Student_ID__ POST variable with a value of '31387714', and a URL of __https://api.example.com:5000/get_snapshot_list__*  
 
 1. curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list  
 2. curl -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list  
 3. curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list  
 
 
-#### Example:
 ```
 user@host:~$  curl -H "X-Api-Key: 1234567" -d "STUDENT_ID=31387714" https://api.example.com:5000/get_snapshot_list
 ["assignment-3_2021-09-09","assignment-2_2021-09-09","assignment-1_2021-09-09","flocking-test-call_2021-09-09","exam_work_2021-09-10"]
@@ -76,17 +78,17 @@ user@host:~$
 
 # 
 
-### Get Snapshot File List ( https://{HOST}:{PORT}/get_snapshot_file_list )
+### Get Snapshot File List 
 
 
 Retrieve a list of files within the specified Canvas students' Snapshot.
 
-##### API URI:* https://{HOST}:{PORT}/get_snapshot_file_list
+##### API URI: https://{HOST}:{PORT}/get_snapshot_file_list
 
 ##### API Return HTTP Codes:
-- *200* on Success with a POST Response
+- *200* Success with a POST Response
 - *406* Failure Missing Data, with a POST Response.
-- *404* Failure No Snapshot Directory with a POST Response.
+- *404* Failure Not Found with a POST Response.
 
 #### Required Headers & Post Variables:
   
@@ -110,8 +112,9 @@ Retrieve a list of files within the specified Canvas students' Snapshot.
     </tr>
 </table>    
 
+#### Curl Command Call Examples:
 
-*In the following example(s) we will use an __X-Api-Key__ of '12345', a __Student_ID__ of '31387714', a __SNAPSHOT_NAME__ of 'assignment-1_2021-09-09', and a URL of __https://api.example.com:5000/get_snapshot_file_list__*  
+*In the following example(s) we will use HEADER vairiable __X-Api-Key__ with a value of '12345', and a __Student_ID__ POST variable with a value of '31387714', a __SNAPSHOT_NAME__ POST variable with a value of 'assignment-1_2021-09-09', and a URL of __https://api.example.com:5000/get_snapshot_file_list__*  
 
 
 1. curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_file_list
@@ -119,7 +122,6 @@ Retrieve a list of files within the specified Canvas students' Snapshot.
 3. curl -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_file_list
 
 
-#### Example
 ```
 user@host:~$  curl -H "X-Api-Key: 1234567" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_file_list
 ["assignment-1.ipynb","assignment-2.ipynb","exercise-1.ipynb","practice/practice-1.ipynb","practice/practice-2.ipynb","assignment-1-grades.html"]
@@ -129,6 +131,15 @@ user@host:~$
 # 
 
 ### Get Snapshot Zip File
+
+Retrieves a zip file of a students snapshot with the specifed STUDENT_ID and SNAPSHOT_NAME Post headers.
+
+##### API URI: https://{HOST}:{PORT}/get_snapshot_zip
+
+##### API Return HTTP Codes:
+- *200* Success with a POST Response
+- *406* Failure Missing Data, with a POST Response.
+- *404* Failure Not Found with a POST Response.
 
 #### Required Headers & Post Variables:
   
@@ -153,13 +164,15 @@ user@host:~$
 </table>   
 
 
-*In the following example(s) we will use an __X-Api-Key__ of '12345', a __Student_ID__ of '31387714', a __SNAPSHOT_NAME__ of 'assignment-1_2021-09-09', and a URL of __https://api.example.com:5000/get_snapshot_zip__*  
+#### Curl Command Call Examples:
+
+*In the following example(s) we will use HEADER vairiable __X-Api-Key__ with a value of '12345', and a __Student_ID__ POST variable with a value of '31387714', a __SNAPSHOT_NAME__ POST variable with a value of 'assignment-1_2021-09-09', and a URL of __https://api.example.com:5000/get_snapshot_zip__*  
 
 1. curl -OJ -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_zip
 2. curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_zip
 3. curl -OJ -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_zip
 
-#### Example
+
 ```
 user@host:~$  curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_zip
 curl: Saved to filename '31387714_assignment-1_2021-09-09.zip'
@@ -170,6 +183,16 @@ user@host:~$
 #
 
 ### Get Snapshot File
+
+Retrieves a Snapshot file of from a students snapshot with the specifed STUDENT_ID SNAPSHOT_NAME, & SNAPSHOT_FILENAME Post headers.
+
+##### API URI: https://{HOST}:{PORT}/get_snapshot_file
+
+##### API Return HTTP Codes:
+- *200* Success with a POST Response
+- *406* Failure Missing Data, with a POST Response.
+- *404* Failure Not Found with a POST Response.
+
 
 #### Required Headers & Post Variables:
   
@@ -199,15 +222,16 @@ user@host:~$
     </tr>
 </table>   
 
+#### Curl Command Call Examples:
 
-*In the following example(s) we will use an __X-Api-Key__ of '12345', a __Student_ID__ of '31387714', a __SNAPSHOT_NAME__ of 'assignment-1_2021-09-09', a __SNAPSHOT_FILENAME__ of 'practice/practice-1.ipynb', and a URL of __https://api.example.com:5000/get_snapshot_file__*  
+*In the following example(s) we will use HEADER vairiable __X-Api-Key__ with a value of '12345', and a __Student_ID__ POST variable with a value of '31387714', a __SNAPSHOT_NAME__ POST variable with a value of 'assignment-1_2021-09-09', a __SNAPSHOT_FILENAME__ Post vatiable with a value of 'practice/practice-1.ipynb', and a URL of __https://api.example.com:5000/get_snapshot_file__*  
 
 1. curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" -d "SNAPSHOT_FILENAME=practice/practice-1.ipynb" https://api.example.com:5000/get_snapshot_file
 2. curl -OJ -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=12-08-2021" -F "SNAPSHOT_FILENAME=practice/practice-1.ipynb" https://api.example.com:5000/get_snapshot_file
 3. curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021&SNAPSHOT_FILENAME=practice/practice-1.ipynb" https://api.example.com:5000/get_snapshot_file
 4. curl -OJ -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021&SNAPSHOT_FILENAME=practice/practice-1.ipynb" https://api.example.com:5000/get_snapshot_file
 
-#### Example
+
 ```
 user@host:~$  curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" -d "SNAPSHOT_FILENAME=practice/practice-1.ipynb" https://api.example.com:5000/get_snapshot_file
 curl: Saved to filename 'practice-1.ipynb'
@@ -218,6 +242,17 @@ user@host:~$
 # 
 
 ### Upload File To Student Home Directory
+
+Upload a file to a students home directory with with the specifed STUDENT_ID SNAPSHOT_NAME Post Header, & an UPLOAD_FILE Binary Post header of a file. Can only upload files with .txt, .html, and .ipynb file extentions.
+
+##### API URI: https://{HOST}:{PORT}/put_student_report
+
+##### API Return HTTP Codes:
+- *200* Success with a POST Response
+- *406* Failure Missing Data, with a POST Response.
+- *404* Failure Not Found with a POST Response.
+- *417* Expectation Failed with a POST Response.
+
 
 #### Required Headers & Post Variables:
   
@@ -241,13 +276,15 @@ user@host:~$
     </tr>
 </table>   
 
-*In the following example(s) we will use HEADER vairiable __X-Api-Key__ with a value of '12345', a __Student_ID__ POST variable with a value of '31387714', a Post variable called __UPLOAD_FILE__ with a binary value of a file '@/some/place/assignment-1-grades.html', and a URL of __https://api.example.com:5000/put_student_report__*  
+#### Curl Command Call Examples:
+
+*In the following example(s) we will use HEADER vairiable __X-Api-Key__ with a value of '12345', and a __Student_ID__ POST variable with a value of '31387714', a POST variable called __UPLOAD_FILE__ with a binary value of a file '@/some/place/assignment-1-grades.html', and a URL of __https://api.example.com:5000/put_student_report__*  
 
 1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "UPLOAD_FILE=@assignment-1-grades.html" https://api.example.com:5000/put_student_report
 2. curl -X POST -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "UPLOAD_FILE=@assignment-1-grades.html" https://api.example.com:5000/put_student_report
 3. curl -X POST -H "X-Api-Key: 12345" -data "STUDENT_ID=31387714&UPLOAD_FILE=@assignment-1-grades.html" https://api.example.com:5000/put_student_report
 
-#### Example
+
 ```
 user@host:~$  curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "UPLOAD_FILE=@assignment-1-grades.html" https://api.example.com:5000/put_student_report
 Success - File Uploaded - assignment-1-grades.html
@@ -292,6 +329,15 @@ user@host:~$
 # 
 
 ### Create Snapshot for All Students
+
+Creates a Snapshot of the all students home directories with a common name, with the SNAPSHOT_NAME Post Value. The current date is added on to the end of the SNAPSHOT_NAME value. Should only be triggered once an hour. 
+
+##### API URI: https://{HOST}:{PORT}/snapshot_all
+
+##### API Return HTTP Codes:
+- *200* Success with a POST Response
+- *406* Failure Missing Data, with a POST Response.
+- *404* Failure Not Found with a POST Response.
 
 
 #### Required Headers & Post Variables:
