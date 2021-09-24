@@ -2,7 +2,7 @@
 
 ## Description
 
-An API to interact with the file system hosting the JupyterHub home directories. It allows Instructors to Snapshot their Students Home Drives for deadlines via an API call. These Snapshots can be triggered via an API call initiaated from a Canvas Assignment deadline. Instructors can create multiple Snapshots with custom names for each student or sets of students. Instructors can retrieve the Snapshots via a ZIP file of the whole Snapshot or by specifing specfic files within the Snapshot. Instryctors can also Put grading reports into the Students Home Directory by an API call.
+An API to interact with the file system hosting the JupyterHub home directories. It allows Instructors to Snapshot their Students Home Drives for deadlines via an API call. These Snapshots can be triggered via an API call initiated from a Canvas Assignment deadline. Instructors can create multiple Snapshots with custom names for each student or sets of students. Instructors can retrieve the Snapshots via a ZIP file of the whole Snapshot or by specifying specific files within the Snapshot. Instructors can also Put grading reports into the Students Home Directory by an API call.
 
 
 ### Headers & Post Variables
@@ -26,7 +26,7 @@ An API to interact with the file system hosting the JupyterHub home directories.
     <tr>
         <td><strong>STUDENT_ID</strong></td>
         <td>Post Request Variable</td>
-        <td>This POST variable value represents a name of a Student Canvas ID.</td>
+        <td>This POST variable value represents a Student Canvas ID.</td>
     </tr>
     <tr>
         <td><strong>SNAPSHOT_NAME</strong></td>
@@ -36,7 +36,7 @@ An API to interact with the file system hosting the JupyterHub home directories.
     <tr>
         <td><strong>SNAPSHOT_FILENAME</strong></td>
         <td>Post Request Variable</td>
-        <td>This POST variable value represents a the name of a file within a Snapshot.</td>
+        <td>This POST variable value represents the name of a file within a Snapshot.</td>
     </tr>
     <tr>
         <td><strong>UPLOAD_FILE</strong></td>
@@ -46,7 +46,7 @@ An API to interact with the file system hosting the JupyterHub home directories.
     <tr>
         <td><strong>Content-Disposition</strong></td>
         <td>Response Header Variable & Data</td>
-        <td>This Header response variable value contains the filename of file binary data being sent by the API. The request data contains the files binary data.</td>
+        <td>This Header response variable value contains the filename of file binary data being sent by the API. The request data contains the associated file binary data as an attachment.</td>
     </tr>
 </table>
 
@@ -132,7 +132,7 @@ Retrieve a list of files within the specified Canvas students' Snapshot.
 
 #### Curl Command Call Examples:
 
-*In the following example(s) we will use HEADER vairiable __X-Api-Key__ with a value of '12345', and a __Student_ID__ POST variable with a value of '31387714', a __SNAPSHOT_NAME__ POST variable with a value of 'assignment-1_2021-09-09', and a URL of __https://api.example.com:5000/get_snapshot_file_list__*  
+*In the following example(s) we will use HEADER variable __X-Api-Key__ with a value of '12345', and a __Student_ID__ POST variable with a value of '31387714', a __SNAPSHOT_NAME__ POST variable with a value of 'assignment-1_2021-09-09', and a URL of __https://api.example.com:5000/get_snapshot_file_list__*  
 
 
 1. curl -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_file_list
@@ -184,7 +184,7 @@ Retrieves a zip file of a students snapshot with the specifed STUDENT_ID and SNA
 
 #### Curl Command Call Examples:
 
-*In the following example(s) we will use HEADER vairiable __X-Api-Key__ with a value of '12345', and a __Student_ID__ POST variable with a value of '31387714', a __SNAPSHOT_NAME__ POST variable with a value of 'assignment-1_2021-09-09', and a URL of __https://api.example.com:5000/get_snapshot_zip__*  
+*In the following example(s) we will use HEADER variable __X-Api-Key__ with a value of '12345', and a __Student_ID__ POST variable with a value of '31387714', a __SNAPSHOT_NAME__ POST variable with a value of 'assignment-1_2021-09-09', and a URL of __https://api.example.com:5000/get_snapshot_zip__*  
 
 1. curl -OJ -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_zip
 2. curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=assignment-1_2021-09-09" https://api.example.com:5000/get_snapshot_zip
@@ -242,7 +242,7 @@ Retrieves a Snapshot file of from a students snapshot with the specifed STUDENT_
 
 #### Curl Command Call Examples:
 
-*In the following example(s) we will use HEADER vairiable __X-Api-Key__ with a value of '12345', and a __Student_ID__ POST variable with a value of '31387714', a __SNAPSHOT_NAME__ POST variable with a value of 'assignment-1_2021-09-09', a __SNAPSHOT_FILENAME__ Post vatiable with a value of 'practice/practice-1.ipynb', and a URL of __https://api.example.com:5000/get_snapshot_file__*  
+*In the following example(s) we will use HEADER variable __X-Api-Key__ with a value of '12345', and a __Student_ID__ POST variable with a value of '31387714', a __SNAPSHOT_NAME__ POST variable with a value of 'assignment-1_2021-09-09', a __SNAPSHOT_FILENAME__ Post vatiable with a value of 'practice/practice-1.ipynb', and a URL of __https://api.example.com:5000/get_snapshot_file__*  
 
 1. curl -OJ -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=12-08-2021" -d "SNAPSHOT_FILENAME=practice/practice-1.ipynb" https://api.example.com:5000/get_snapshot_file
 2. curl -OJ -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=12-08-2021" -F "SNAPSHOT_FILENAME=practice/practice-1.ipynb" https://api.example.com:5000/get_snapshot_file
@@ -296,7 +296,7 @@ Upload a file to a students home directory with with the specifed STUDENT_ID SNA
 
 #### Curl Command Call Examples:
 
-*In the following example(s) we will use HEADER vairiable __X-Api-Key__ with a value of '12345', and a __Student_ID__ POST variable with a value of '31387714', a POST variable called __UPLOAD_FILE__ with a binary value of a file '@/some/place/assignment-1-grades.html', and a URL of __https://api.example.com:5000/put_student_report__*  
+*In the following example(s) we will use HEADER variable __X-Api-Key__ with a value of '12345', and a __Student_ID__ POST variable with a value of '31387714', a POST variable called __UPLOAD_FILE__ with a binary value of a file '@/some/place/assignment-1-grades.html', and a URL of __https://api.example.com:5000/put_student_report__*  
 
 1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "UPLOAD_FILE=@assignment-1-grades.html" https://api.example.com:5000/put_student_report
 2. curl -X POST -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "UPLOAD_FILE=@assignment-1-grades.html" https://api.example.com:5000/put_student_report
@@ -338,7 +338,7 @@ user@host:~$
 
 #### Curl Command Call Examples:
   
-*In the following example(s) we will use HEADER vairiable __X-Api-Key__ with a value of '12345', a __Student_ID__ POST variable with a value of '31387714',  a __SNAPSHOT_NAME__ POST variable with a value of 'Assignment-1', and a URL of __https://api.example.com:5000/snapshot__*  
+*In the following example(s) we will use HEADER variable __X-Api-Key__ with a value of '12345', a __Student_ID__ POST variable with a value of '31387714',  a __SNAPSHOT_NAME__ POST variable with a value of 'Assignment-1', and a URL of __https://api.example.com:5000/snapshot__*  
 
 1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_ID=31387714" -F "SNAPSHOT_NAME=Assignment-1" https://api.example.com:5000/snapshot
 2. curl -X POST -H "X-Api-Key: 12345" -d "STUDENT_ID=31387714" -d "SNAPSHOT_NAME=Assignment-1" https://api.example.com:5000/snapshot
@@ -382,7 +382,7 @@ Creates a Snapshot of the all students home directories with a common name, with
 
 #### Curl Command Call Examples:
 
-*In the following example(s) we will use HEADER vairiable __X-Api-Key__ with a value of '12345', a __SNAPSHOT_NAME__ POST variable with a value of 'assignment-1-all', and a URL of __https://api.example.com:5000/snapshot_all__*  
+*In the following example(s) we will use HEADER variable __X-Api-Key__ with a value of '12345', a __SNAPSHOT_NAME__ POST variable with a value of 'assignment-1-all', and a URL of __https://api.example.com:5000/snapshot_all__*  
   
 1. curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_NAME=assignment-1-all" https://api.example.com:5000/snapshot_all
 2. curl -X POST -H "X-Api-Key: 12345" -d "STUDENT_NAME=assignment-1-all" https://api.example.com:5000/snapshot_all
