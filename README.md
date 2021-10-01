@@ -471,7 +471,7 @@ user@host:~$
 
   ### Canvas LTI Example
 
-  <img src="https://github.com/ubc/jupyter-canvas-api/blob/master/LTI.png?raw=true" width="200">
+  <img src="https://github.com/ubc/jupyter-canvas-api/blob/master/LTI.png?raw=true">
   
 ## Docker Deployments
 
