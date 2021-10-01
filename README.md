@@ -471,7 +471,7 @@ user@host:~$
 
   ### Canvas LTI Example
 
-  ![Canvas LTI](https://github.com/[username]/[reponame]/blob/[branch]/lti.jpg?raw=true)
+  ![Canvas LTI](https://github.com/ubc/jupyter-canvas-api/blob/master/LTI.png?raw=true)
   
 ## Docker Deployments
 
