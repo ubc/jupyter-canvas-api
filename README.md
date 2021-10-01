@@ -463,9 +463,15 @@ user@host:~$
   
 ## Repo Files
   
-## Jupyter Hub Integration
+## Jupyter Hub & Canvas LTI 
+  
+  ### Requirements:
+  1. The Jupyter user instances' home directory storage must be accessesable to the API System via a mount point. Suggested Types include, NFS, AWS EFS via NFS, CephFS, CIFS, etc.
+  2. The Canvas LTI Application needs to be setup in Public Mode in order to share the Canvas Student ID's with the API system.
 
-## Canvas LTI Integration
+  ### Canvas LTI Example
+
+  ![Canvas LTI](https://github.com/[username]/[reponame]/blob/[branch]/lti.jpg?raw=true)
   
 ## Docker Deployments
 
