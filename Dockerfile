@@ -46,7 +46,8 @@ RUN APT_INSTALL="apt-get install -y " && \
 # ======================================================================							
 # Application Specific Commands				
 #
-# ----------------------------------------------------------------------							
+# ----------------------------------------------------------------------
+							
 EXPOSE 5000											
 COPY usr/share/jupyter-canvas-api/api-server.py /usr/share/jupyter-canvas-api/api-server.py
 COPY usr/share/jupyter-canvas-api/requirements.txt /usr/share/jupyter-canvas-api/requirements.txt
