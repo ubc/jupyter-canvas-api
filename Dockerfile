@@ -54,6 +54,7 @@ COPY usr/share/jupyter-canvas-api/requirements.txt /usr/share/jupyter-canvas-api
 COPY usr/local/bin/hourly-rsync.sh /etc/cron.hourly/hourly-rsync
 RUN mkdir /mnt/efs
 RUN chmod +x /etc/cron.hourly/hourly-rsync
+RUN touch /etc/crontab /etc/cron.*/*
 WORKDIR /usr/share/jupyter-canvas-api/
 RUN pip3 install -r /usr/share/jupyter-canvas-api/requirements.txt
 #CMD [ "python3","-u","/usr/share/jupyter-canvas-api/api-server.py"]
