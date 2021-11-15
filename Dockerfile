@@ -55,8 +55,7 @@ COPY usr/local/bin/hourly-rsync.sh /etc/cron.hourly/hourly-api-rsync
 RUN mkdir /mnt/efs
 RUN chmod +x /etc/cron.hourly/hourly-api-rsync
 RUN touch /etc/crontab /etc/cron.*/*
-run printenv | grep -v "no_proxy" > /etc/environment
 WORKDIR /usr/share/jupyter-canvas-api/
 RUN pip3 install -r /usr/share/jupyter-canvas-api/requirements.txt
 #CMD [ "python3","-u","/usr/share/jupyter-canvas-api/api-server.py"]
-CMD /etc/init.d/cron start && python3 -u /usr/share/jupyter-canvas-api/api-server.py
+CMD printenv | grep -v "no_proxy" > /etc/environment && /etc/init.d/cron start && python3 -u /usr/share/jupyter-canvas-api/api-server.py
