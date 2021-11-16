@@ -566,7 +566,7 @@ def snapshot():
     # RSYNC Student Home Directory Structure to Final Snapshot Directory
     sysrsync.run(source=HOMEDIR,
              destination=SNAPDIR,
-             options=['-a' ,'-v' ,'-f"+ */"' ,'-f"- *"', '--exclude="*/*"'])       
+             options=['-a' ,'-v' ,'-f"+ */"' ,'-f"- *"', '--exclude="*/*/"'])       
             
     # RSYNC Student Home to Intermediate Snapshot Directory
     sysrsync.run(source=STUDENT_PATH,
@@ -663,7 +663,7 @@ def snapshot_all():
         # RSYNC Student Home Directory Structure to Final Snapshot Directory
         sysrsync.run(source=HOMEDIR,
              destination=SNAPDIR,
-             options=['-a' ,'-v' ,'-f"+ */"' ,'-f"- *"', '--exclude="*/*"'])    
+             options=['-a' ,'-v' ,'-f"+ */"' ,'-f"- *"', '--exclude="*/*/"'])    
                 
         # RSYNC Student Home to Intermediate Snapshot Directory
         sysrsync.run(source=STUDENT_PATH,
