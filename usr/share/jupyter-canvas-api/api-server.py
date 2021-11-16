@@ -540,12 +540,12 @@ def snapshot():
                 message='Not Found - STUDENT_ID Home Directory was Not Found.'
                 ), 404)
 
-    # Error if Student Snapshot Directory Does Not Exist
-    if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
-        return (jsonify(status=404,
-                error='Not Found - Snapshot Directory was Not Found',
-                message='Not Found - Student Snapshot Directory Not Found.'
-                ), 404)
+#    # Error if Student Snapshot Directory Does Not Exist
+#    if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
+#        return (jsonify(status=404,
+#                error='Not Found - Snapshot Directory was Not Found',
+#                message='Not Found - Student Snapshot Directory Not Found.'
+#                ), 404)
 
     # Error if Specific Snapshot Already Exists
     if (SNAP_NAME_PATH_OBJ.exists()
@@ -563,6 +563,11 @@ def snapshot():
         except:
             time.sleep(2)
 
+    # RSYNC Student Home Directory Structure to Final Snapshot Directory
+    sysrsync.run(source=STUDENT_PATH,
+             destination=SNAP_STUDENT_PATH,
+             options=['-a' ,'-v' ,'-f"+ */"' ,'-f"- *"', '--exclude="*/*"'])       
+            
     # RSYNC Student Home to Intermediate Snapshot Directory
     sysrsync.run(source=STUDENT_PATH,
              destination=INTSNAP_STUDENT_PATH,
@@ -626,11 +631,11 @@ def snapshot_all():
         SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
 
         # Error if Student Snapshot Directory Does Not Exist
-        if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
-            return (jsonify(status=404,
-                error='Not Found - Snapshot Directory was Not Found',
-                message='Not Found - Student ('+STUDENT+') Snapshot Directory Not Found.'
-                ), 404)
+#        if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
+#            return (jsonify(status=404,
+#                error='Not Found - Snapshot Directory was Not Found',
+#                message='Not Found - Student ('+STUDENT+') Snapshot Directory Not Found.'
+#                ), 404)
 
         # Error if Specific Snapshot Already Exists
         if (SNAP_NAME_PATH_OBJ.exists() and SNAP_NAME_PATH_OBJ.is_dir()):
@@ -655,6 +660,11 @@ def snapshot_all():
             except:
                 time.sleep(2)
 
+        # RSYNC Student Home Directory Structure to Final Snapshot Directory
+        sysrsync.run(source=STUDENT_PATH,
+             destination=SNAP_STUDENT_PATH,
+             options=['-a' ,'-v' ,'-f"+ */"' ,'-f"- *"', '--exclude="*/*"'])    
+                
         # RSYNC Student Home to Intermediate Snapshot Directory
         sysrsync.run(source=STUDENT_PATH,
                      destination=INTSNAP_STUDENT_PATH,
