@@ -67,7 +67,6 @@ if not os.path.isdir(UPLOAD_FOLDER):
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER # Flask Upload Directory
 
-
 # Define Logger
 logger = logging.getLogger('Jupyter-Canvas-API')
 
@@ -101,13 +100,14 @@ def slugify(value, allow_unicode=False):
 def not_authorized(e):
     """ Response sent back when not authorized. """
     if request.headers.getlist("X-Forwarded-For"):
-        client_ip_address = request.headers.getlist("X-Forwarded-For")[0]
+        .split(',')
+        client_ip_address = str(request.headers.getlist("X-Forwarded-For").split(','))
     else:
         client_ip_address = request.remote_addr
     logger.error("Invalid Authentication from IP: "+str(client_ip_address))
 
     return (jsonify(status=401, error='Not Authorized',
-            message='You are authorized to access the URL requested.'),
+            message='You are Not authorized to access the URL requested.'),
             401)
 
 def check_auth():
