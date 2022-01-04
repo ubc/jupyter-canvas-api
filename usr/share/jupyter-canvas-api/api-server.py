@@ -100,6 +100,8 @@ def slugify(value, allow_unicode=False):
 @app.errorhandler(401)
 def not_authorized(e):
     """ Response sent back when not authorized. """
+    client_ip_address = flask.request.remote_addr
+    logger.error("Invalid Authentication from IP: "+str(client_ip_address))
 
     return (jsonify(status=401, error='Not Authorized',
             message='You are authorized to access the URL requested.'),
@@ -167,6 +169,7 @@ def get_snapshot_file_list():
 
     # Error if Snapshot Directory Does Not Exist
     if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
+        logger.info("Snapshots Directory Does NOT Exist for: "+str(STUDENT_ID))
         return (jsonify(status=404,
                 error='Not Found - Snapshot Directory was Not Found',
                 message='Not Found - Student Snapshot Directory Not Found.'
@@ -175,6 +178,7 @@ def get_snapshot_file_list():
     # Error if Specific Snapshot Does Not Exist
     if not (SNAP_NAME_PATH_OBJ.exists()
             and SNAP_NAME_PATH_OBJ.is_dir()):
+        logger.info("No Snapshot Found For Student: "+str(STUDENT_ID)+" and Snapshot: "+str(SNAPSHOT_NAME))
         return (jsonify(status=404,
                 error='Not Found - Snapshot was Not Found',
                 message='Not Found - Snapshot Not Found.'), 404)
@@ -188,6 +192,7 @@ def get_snapshot_file_list():
 
     # Error if No Snapshot Files Found
     if not SNAPSHOT_FILES:
+        logger.info("No Snapshots Files Found For Student: "+str(STUDENT_ID)+" and Snapshot: "+str(SNAPSHOT_NAME))
         return (jsonify(status=404,
                 error='Not Found - No Snapshots Found',
                 message='Not Found - No Snapshot Directories Found.'),
