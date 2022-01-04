@@ -100,7 +100,10 @@ def slugify(value, allow_unicode=False):
 @app.errorhandler(401)
 def not_authorized(e):
     """ Response sent back when not authorized. """
-    client_ip_address = request.remote_addr
+    if request.headers.getlist("X-Forwarded-For"):
+        client_ip_address = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        client_ip_address = request.remote_addr
     logger.error("Invalid Authentication from IP: "+str(client_ip_address))
 
     return (jsonify(status=401, error='Not Authorized',
