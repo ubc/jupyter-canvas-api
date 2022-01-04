@@ -9,6 +9,8 @@ snapshots of student’s directories, list files within a students’ snapshot, 
 such as reports into the students’ home directory.
 """
 
+import logging
+from sys import stdout
 import os
 import uuid
 import io
@@ -65,6 +67,16 @@ if not os.path.isdir(UPLOAD_FOLDER):
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER # Flask Upload Directory
 
+
+# Define Logger
+logger = logging.getLogger('Jupyter-Canvas-API')
+
+logger.setLevel(logging.DEBUG) # set logger level
+logFormatter = logging.Formatter\
+("%(name)-12s %(asctime)s %(levelname)-8s %(filename)s:%(funcName)s %(message)s")
+consoleHandler = logging.StreamHandler(stdout) 
+consoleHandler.setFormatter(logFormatter)
+logger.addHandler(consoleHandler)
 
 # Converts Strings into FileName Safe Values
 def slugify(value, allow_unicode=False):
