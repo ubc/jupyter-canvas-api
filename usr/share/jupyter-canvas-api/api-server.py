@@ -100,7 +100,7 @@ def slugify(value, allow_unicode=False):
 @app.errorhandler(401)
 def not_authorized(e):
     """ Response sent back when not authorized. """
-    client_ip_address = flask.request.remote_addr
+    client_ip_address = request.remote_addr
     logger.error("Invalid Authentication from IP: "+str(client_ip_address))
 
     return (jsonify(status=401, error='Not Authorized',
