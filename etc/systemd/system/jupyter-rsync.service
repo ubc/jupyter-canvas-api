@@ -1,5 +1,5 @@
 [Unit]
-Description=Jupyter Hub Cluster Student Direcory Snapshot Creation and Update Script
+Description=Jupyter Hub Cluster Student Directory Snapshot Creation and Update Script
 Wants=network.service jupyter-rsync.timer
 
 [Service]

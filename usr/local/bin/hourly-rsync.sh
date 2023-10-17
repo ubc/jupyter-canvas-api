@@ -93,7 +93,7 @@ do
         sleep 10
 
     else
-        echo "Lock Aquired!"
+        echo "Lock Acquired!"
 
         # Create Final Snap Location Student Directory If Does Not Exist
         # This is what creates the student Final Snap Locations

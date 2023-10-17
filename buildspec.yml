@@ -8,7 +8,7 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - echo "Attempting ECR Login"
-      - echo "ECR Login Sucessful"
+      - echo "ECR Login Successful"
       - echo "changing permissions on project directory"
       - chmod 777 *
       - echo "permissions changed"
@@ -24,11 +24,11 @@ phases:
       - aws eks --region ca-central-1 update-kubeconfig --name $KUBE_CLUSTER
       - kubectl config set-context --current --namespace=jhub
       - kubectl get pods
- 
-   
 
-     
- 
+
+
+
+
 
   build:
     commands:

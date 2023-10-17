@@ -1,11 +1,11 @@
-# -----------------------------------------------------------------------					
+# -----------------------------------------------------------------------
 # UBC IT - CTLC - Jupyter Hub Course API for Instructors
 # Created By: Balaji Srinivasarao, Rahim Khoja, & Pan Luo
 # docker build -t IMAGE_ID .
-# ======================================================================							
+# ======================================================================
 # Container Choice
-FROM debian:buster-slim																					
-ENV LANG C.UTF-8																					
+FROM debian:buster-slim
+ENV LANG C.UTF-8
 # TimeZone Settings
 ENV TZ 'America/Vancouver'
 RUN echo $TZ > /etc/timezone && \
@@ -15,40 +15,40 @@ ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
 dpkg-reconfigure -f noninteractive tzdata && \
 apt-get clean
 # Package Installation Command
-RUN APT_INSTALL="apt-get install -y " && \																													
-	apt-get update && \																				
-# ======================================================================							
-# Apt Packages																								
-# ----------------------------------------------------------------------							
-	SYSTEM_PACKAGES=noninteractive $APT_INSTALL \	
+RUN APT_INSTALL="apt-get install -y " && \
+	apt-get update && \
+# ======================================================================
+# Apt Packages
+# ----------------------------------------------------------------------
+	SYSTEM_PACKAGES=noninteractive $APT_INSTALL \
 	        software-properties-common \
-		build-essential \																			
-		apt-utils \																					
-		ca-certificates \																			
-		wget \																						
-		git \	
+		build-essential \
+		apt-utils \
+		ca-certificates \
+		wget \
+		git \
 		curl \
 		rsync \
 		vim \
-		python3 \																																					
+		python3 \
 		python3-pip \
 		cron \
 		zip \
 		unzip \
-		&& \																																										
-# ======================================================================							
-# Container Cleanup & Finalization																				
-# ----------------------------------------------------------------------							
-	ldconfig && \																					
-	apt-get clean && \																				
-	apt-get autoremove && \																			
-	rm -rf /var/lib/apt/lists/* /tmp/* ~/*	
-# ======================================================================							
-# Application Specific Commands				
+		&& \
+# ======================================================================
+# Container Cleanup & Finalization
+# ----------------------------------------------------------------------
+	ldconfig && \
+	apt-get clean && \
+	apt-get autoremove && \
+	rm -rf /var/lib/apt/lists/* /tmp/* ~/*
+# ======================================================================
+# Application Specific Commands
 #
 # ----------------------------------------------------------------------
-							
-EXPOSE 5000											
+
+EXPOSE 5000
 COPY usr/share/jupyter-canvas-api/api-server.py /usr/share/jupyter-canvas-api/api-server.py
 COPY usr/share/jupyter-canvas-api/requirements.txt /usr/share/jupyter-canvas-api/requirements.txt
 COPY usr/local/bin/hourly-rsync.sh /etc/cron.hourly/hourly-api-rsync
