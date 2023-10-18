@@ -24,6 +24,7 @@ import zipfile as zf
 from functools import wraps
 from pathlib import Path
 from sys import stdout
+from paste.translogger import TransLogger
 
 import sysrsync
 from flask import Flask, request, jsonify, abort, make_response
@@ -39,7 +40,7 @@ __email__ = "rahim.khoja@ubc.ca"
 __status__ = "Development"
 
 # API Variables Defined by Environment Variable
-DEBUG = os.getenv('DEBUG', 'False') == 'True'  # API Debug
+DEBUG = os.getenv('FLASK_DEBUG', 'False') == 'True'  # API Debug
 PORT = int(os.getenv('JUPYTER_API_PORT', '5000'))  # API TCP Port Number
 HOST = str(os.getenv('JUPYTER_API_HOST', '0.0.0.0'))  # API TCP Address
 APIKEY = str(os.getenv('JUPYTER_API_KEY', '12345'))  # API Key Value
@@ -69,12 +70,15 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER  # Flask Upload Directory
 
 # Define Logger
 logger = logging.getLogger('Jupyter-Canvas-API')
-
 logger.setLevel(logging.DEBUG)  # set logger level
 logFormatter = logging.Formatter("%(name)-12s %(asctime)s %(levelname)-8s %(filename)s:%(funcName)s %(message)s")
 consoleHandler = logging.StreamHandler(stdout)
 consoleHandler.setFormatter(logFormatter)
 logger.addHandler(consoleHandler)
+
+loggerWaitress = logging.getLogger('waitress')
+if DEBUG:
+    loggerWaitress.setLevel(logging.DEBUG)
 
 
 # Converts Strings into FileName Safe Values
@@ -334,7 +338,6 @@ def get_snapshot_file():
     else:
         SNAPSHOT_SHORT_FILENAME = SNAPSHOT_FILENAME
 
-    SNAPSHOT_FILE_BYTES = ''  # Empty File Variable
     with open(SNAP_FILE_PATH, 'rb') as OPEN_FILE:  # Open Snapshot File and Read it into the File Variable
         SNAPSHOT_FILE_BYTES = OPEN_FILE.read()
 
@@ -352,8 +355,10 @@ def get_snapshot_file():
 
 #
 # Curl Usage Command Examples For '/get_snapshot_zip' API Call
-# Required Post Variables: STUDENT_ID, SNAPSHOT_NAME
+# Required Post Variables: SNAPSHOT_NAME
 # Required Header Variables: X-Api-Key
+# Optional Post Variables: STUDENT_ID
+# If STUDENT_ID does not exist in the request, the whole snapshot will be archived and downloaded.
 # Example Response: curl: Saved to filename '31387714_12-08-2021.zip'
 #
 # curl -OJ -H "X-Api-Key: 12345" --data "STUDENT_ID=31387714&SNAPSHOT_NAME=12-08-2021" http://localhost:5000/get_snapshot_zip
@@ -365,48 +370,52 @@ def get_snapshot_file():
 def get_snapshot_zip():
     """ Get Zip File of Specified Student Snapshot. """
 
-    STUDENT_ID = request.form.get('STUDENT_ID')  # StudentID Post Variable
-    SNAPSHOT_NAME = request.form.get('SNAPSHOT_NAME')  # Snapshot Name Variable
+    student_id = request.form.get('STUDENT_ID')  # StudentID Post Variable
+    snapshot_name = request.form.get('SNAPSHOT_NAME')  # Snapshot Name Variable
 
     # Error if StudentID Post Variable Missing
-    if not STUDENT_ID:
-        return (jsonify(status=406,
-                        error='Not Acceptable - Missing Data',
-                        message='Not Acceptable - Missing STUDENT_ID Post Value.'
-                        ), 406)
+    # if not student_id:
+    #     return (jsonify(status=406,
+    #                     error='Not Acceptable - Missing Data',
+    #                     message='Not Acceptable - Missing STUDENT_ID Post Value.'
+    #                     ), 406)
 
     # Error if Snapshot Name Post Variable Missing
-    if not SNAPSHOT_NAME:
+    if not snapshot_name:
         return (jsonify(status=406,
                         error='Not Acceptable - Missing Data',
                         message='Not Acceptable - Missing SNAPSHOT_NAME Post Value.'
                         ), 406)
+    if student_id:
+        snap_path = SNAPDIR + student_id  # Student Snapshot Directory Path
+        snap_name_path = snap_path + '/' + snapshot_name  # Student Snapshot Path
+        zip_file_name = student_id + '_' + snapshot_name + '.zip'  # Snapshot Zip File Name
+    else:
+        snap_path = SNAPDIR  # Student Snapshot Directory Path
+        snap_name_path = snap_path + '/' + snapshot_name  # Student Snapshot Path
+        zip_file_name = snapshot_name + '.zip'  # Snapshot Zip File Name
 
-    SNAP_STUDENT_PATH = SNAPDIR + STUDENT_ID  # Student Snapshot Directory Path
-    SNAP_NAME_PATH = SNAP_STUDENT_PATH + '/' + SNAPSHOT_NAME  # Student Snapshot Path
-    ZIP_FILE_NAME = STUDENT_ID + '_' + SNAPSHOT_NAME + '.zip'  # Snapshot Zip File Name
-
-    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
-    SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
+    snap_student_path_obj = Path(snap_path)  # Student Snapshot Directory Path Object
+    snap_name_path_obj = Path(snap_name_path)  # Student Snapshot Path Object
 
     # Error if Student Snapshot Directory Does Not Exist
-    if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
+    if not (snap_student_path_obj.exists() and snap_student_path_obj.is_dir()):
         return (jsonify(status=404,
                         error='Not Found - Snapshot Directory was Not Found',
                         message='Not Found - Student Snapshot Directory Not Found.'
                         ), 404)
 
     # Error if Specific Snapshot Does Not Exist
-    if not (SNAP_NAME_PATH_OBJ.exists()
-            and SNAP_NAME_PATH_OBJ.is_dir()):
+    if not (snap_name_path_obj.exists()
+            and snap_name_path_obj.is_dir()):
         return (jsonify(status=404,
                         error='Not Found - Snapshot was Not Found',
                         message='Not Found - Snapshot Not Found.'), 404)
 
     # Create Zip File of Snapshot with Relative Path
-    SNAP_FILE = io.BytesIO()  # Create Empty File In Memory
-    with zf.ZipFile(SNAP_FILE, 'w') as SNAP_ZIP_FILE:  # Open Empty File as Zip File Object for Writing
-        for (dirname, subdirs, files) in os.walk(SNAP_NAME_PATH + '/'):  # Loop Through Snapshot Files and Directories
+    snap_file = io.BytesIO()  # Create Empty File In Memory
+    with zf.ZipFile(snap_file, 'w') as SNAP_ZIP_FILE:  # Open Empty File as Zip File Object for Writing
+        for (dirname, subdirs, files) in os.walk(snap_name_path + '/'):  # Loop Through Snapshot Files and Directories
             if "/." not in dirname:
                 SNAP_ZIP_FILE.write(dirname, dirname.replace(SNAPDIR, ''))  # Add Directory to Zip File Object
                 for filename in files:  # Loop Through Each File in Snapshot Directory
@@ -416,13 +425,13 @@ def get_snapshot_zip():
                                                          filename).replace(SNAPDIR, ''),
                                             zf.ZIP_DEFLATED)  # Add Snapshot File To Zip File Object
         SNAP_ZIP_FILE.close()  # Finish Writing to Zip File Object
-    SNAP_FILE.seek(0)  # Reset position of Snap Zip File to Beginning
+    snap_file.seek(0)  # Reset position of Snap Zip File to Beginning
 
-    response = make_response(SNAP_FILE.read())  # Includes the Zip File into the Response
+    response = make_response(snap_file.read())  # Includes the Zip File into the Response
     response.headers.set('Content-Type', 'zip')  # Sets the Response Content-Type to Zip File
     # Sets the Response Content-Disposition to Attachment and Includes the File Name
     response.headers.set('Content-Disposition', 'attachment',
-                         filename='%s' % ZIP_FILE_NAME)
+                         filename='%s' % zip_file_name)
 
     # Return Response with Zip File
     return response
@@ -705,4 +714,4 @@ def snapshot_all():
 
 if __name__ == '__main__':
     # app.run(host=HOST, port=PORT, debug=DEBUG)
-    serve(app, host=HOST, port=PORT)
+    serve(TransLogger(app, setup_console_handler=False), host=HOST, port=PORT)
