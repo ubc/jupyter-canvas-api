@@ -45,9 +45,9 @@ PORT = int(os.getenv('JUPYTER_API_PORT', '5000'))  # API TCP Port Number
 HOST = str(os.getenv('JUPYTER_API_HOST', '0.0.0.0'))  # API TCP Address
 APIKEY = str(os.getenv('JUPYTER_API_KEY', '12345'))  # API Key Value
 HOMEDIR = str(os.getenv('JNOTE_HOME', '/mnt/efs/stat-100a-home/'))  # Home Directory Root
-SNAPDIR = str(os.getenv('JNOTE_SNAP', '/mnt/efs/stat-100a-snap/'))  # Instructor Snapshot Directory
-INTSNAPDIR = str(os.getenv('JNOTE_INTSNAP', '/mnt/efs/stat-100a-internal/'))  # Intermediary Snapshot Directory
-COURSECODE = str(os.getenv('JNOTE_COURSE_CODE', 'STAT100a'))  # The API Course Code
+SNAPSHOT_DIR = str(os.getenv('JNOTE_SNAP', '/mnt/efs/stat-100a-snap/'))  # Instructor Snapshot Directory
+INTERMEDIARY_DIR = str(os.getenv('JNOTE_INTSNAP', '/mnt/efs/stat-100a-internal/'))  # Intermediary Snapshot Directory
+COURSE_CODE = str(os.getenv('JNOTE_COURSE_CODE', 'STAT100a'))  # The API Course Code
 
 UPLOAD_FOLDER = os.path.join('/tmp', 'uploads')  # Temporary Upload Folder
 ALLOWED_EXTENSIONS = {'txt', 'html', 'htm', 'ipynb'}  # Allowed Upload File Types
@@ -153,62 +153,62 @@ def requires_apikey(f):
 def get_snapshot_file_list():
     """ Get List of Snapshot Files for the Specified Student and Snapshot. """
 
-    STUDENT_ID = request.form.get('STUDENT_ID')  # StudentID Post Variable
-    SNAPSHOT_NAME = request.form.get('SNAPSHOT_NAME')  # Snapshot Name Variable
+    student_id = request.form.get('STUDENT_ID')  # StudentID Post Variable
+    snapshot_name = request.form.get('SNAPSHOT_NAME')  # Snapshot Name Variable
 
     # Error if StudentID Post Variable Missing
-    if not STUDENT_ID:
+    if not student_id:
         return (jsonify(status=406,
                         error='Not Acceptable - Missing Data',
                         message='Not Acceptable - Missing StudentID Post Value.'
                         ), 406)
 
     # Error if Snapshot Name Post Variable Missing
-    if not SNAPSHOT_NAME:
+    if not snapshot_name:
         return (jsonify(status=406,
                         error='Not Acceptable - Missing Data',
                         message='Not Acceptable - Missing SNAPSHOT_NAME Post Value.'
                         ), 406)
 
-    SNAP_STUDENT_PATH = SNAPDIR + STUDENT_ID  # Student Snapshot Directory Path
-    SNAP_NAME_PATH = SNAP_STUDENT_PATH + '/' + SNAPSHOT_NAME  # Student Snapshot Path
+    snap_student_path = SNAPSHOT_DIR + student_id  # Student Snapshot Directory Path
+    snap_name_path = snap_student_path + '/' + snapshot_name  # Student Snapshot Path
 
-    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
-    SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
+    snap_student_path_obj = Path(snap_student_path)  # Student Snapshot Directory Path Object
+    snap_name_path_obj = Path(snap_name_path)  # Student Snapshot Path Object
 
     # Error if Snapshot Directory Does Not Exist
-    if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
-        logger.info("Snapshots Directory Does NOT Exist for: " + str(STUDENT_ID))
+    if not (snap_student_path_obj.exists() and snap_student_path_obj.is_dir()):
+        logger.info("Snapshots Directory Does NOT Exist for: " + str(student_id))
         return (jsonify(status=404,
                         error='Not Found - Snapshot Directory was Not Found',
                         message='Not Found - Student Snapshot Directory Not Found.'
                         ), 404)
 
     # Error if Specific Snapshot Does Not Exist
-    if not (SNAP_NAME_PATH_OBJ.exists()
-            and SNAP_NAME_PATH_OBJ.is_dir()):
-        logger.info("No Snapshot Found For Student: " + str(STUDENT_ID) + " and Snapshot: " + str(SNAPSHOT_NAME))
+    if not (snap_name_path_obj.exists()
+            and snap_name_path_obj.is_dir()):
+        logger.info("No Snapshot Found For Student: " + str(student_id) + " and Snapshot: " + str(snapshot_name))
         return (jsonify(status=404,
                         error='Not Found - Snapshot was Not Found',
                         message='Not Found - Snapshot Not Found.'), 404)
 
     # Get List Of Files In Snapshot Directory
-    SNAPSHOT_FILES = glob.glob(os.path.join(SNAP_NAME_PATH + '/', '**/*'),
+    snapshot_files = glob.glob(os.path.join(snap_name_path + '/', '**/*'),
                                recursive=True)
-    SNAPSHOT_FILES = [f for f in SNAPSHOT_FILES if os.path.isfile(f)]
-    SNAPSHOT_FILES = [s.replace(SNAP_NAME_PATH + '/', '') for s in
-                      SNAPSHOT_FILES]
+    snapshot_files = [f for f in snapshot_files if os.path.isfile(f)]
+    snapshot_files = [s.replace(snap_name_path + '/', '') for s in
+                      snapshot_files]
 
     # Error if No Snapshot Files Found
-    if not SNAPSHOT_FILES:
-        logger.info("No Snapshots Files Found For Student: " + str(STUDENT_ID) + " and Snapshot: " + str(SNAPSHOT_NAME))
+    if not snapshot_files:
+        logger.info("No Snapshots Files Found For Student: " + str(student_id) + " and Snapshot: " + str(snapshot_name))
         return (jsonify(status=404,
                         error='Not Found - No Snapshots Found',
                         message='Not Found - No Snapshot Directories Found.'),
                 404)
 
     # Return List of Snapshot Files
-    return jsonify(SNAPSHOT_FILES), 200
+    return jsonify(snapshot_files), 200
 
 
 #
@@ -226,40 +226,40 @@ def get_snapshot_file_list():
 def get_snapshot_list():
     """ Get List of Snapshot Directories for the Specified Student. """
 
-    STUDENT_ID = request.form.get('STUDENT_ID')  # StudentID Post Variable
+    student_id = request.form.get('STUDENT_ID')  # StudentID Post Variable
 
     # Error if StudentID Post Variable Missing
-    if not STUDENT_ID:
+    if not student_id:
         return (jsonify(status=406,
                         error='Not Acceptable - Missing Data',
                         message='Not Acceptable - Missing StudentID Post Value.'
                         ), 406)
 
-    SNAP_STUDENT_PATH = SNAPDIR + STUDENT_ID  # Student Snapshot Directory Path
+    snap_student_path = SNAPSHOT_DIR + student_id  # Student Snapshot Directory Path
 
-    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
+    snap_student_path_obj = Path(snap_student_path)  # Student Snapshot Directory Path Object
 
     # Error if Snapshot Directory Does Not Exist
-    if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
+    if not (snap_student_path_obj.exists() and snap_student_path_obj.is_dir()):
         return (jsonify(status=404,
                         error='Not Found - Snapshot Directory was Not Found',
                         message='Not Found - Student Snapshot Directory Not Found.'
                         ), 404)
 
     # Get List of Directories in Student Snapshot Directory
-    SNAPSHOTS = [f.path for f in os.scandir(SNAP_STUDENT_PATH) if f.is_dir()]
-    SNAPSHOTS = [x for x in SNAPSHOTS if '.' not in x]
-    SNAPSHOTS = [s.replace(SNAP_STUDENT_PATH + '/', '') for s in SNAPSHOTS]
+    snapshots = [f.path for f in os.scandir(snap_student_path) if f.is_dir()]
+    snapshots = [x for x in snapshots if '.' not in x]
+    snapshots = [s.replace(snap_student_path + '/', '') for s in snapshots]
 
     # Error No Snapshots Found
-    if not SNAPSHOTS:
+    if not snapshots:
         return (jsonify(status=404,
                         error='Not Found - No Snapshots Found',
                         message='Not Found - No Snapshot Directories Found.'),
                 404)
 
     # Return List of Student Snapshots
-    return jsonify(SNAPSHOTS), 200
+    return jsonify(snapshots), 200
 
 
 #
@@ -278,76 +278,76 @@ def get_snapshot_list():
 def get_snapshot_file():
     """ Get the Specified File from Specified Student Snapshot. """
 
-    STUDENT_ID = request.form.get('STUDENT_ID')  # StudentID Post Variable
-    SNAPSHOT_NAME = request.form.get('SNAPSHOT_NAME')  # Snapshot Name Variable
-    SNAPSHOT_FILENAME = request.form.get('SNAPSHOT_FILENAME')  # Snapshot File Name Variable
+    student_id = request.form.get('STUDENT_ID')  # StudentID Post Variable
+    snapshot_name = request.form.get('SNAPSHOT_NAME')  # Snapshot Name Variable
+    snapshot_filename = request.form.get('SNAPSHOT_FILENAME')  # Snapshot File Name Variable
 
     # Error if StudentID Post Variable Missing
-    if not STUDENT_ID:
+    if not student_id:
         return (jsonify(status=406,
                         error='Not Acceptable - Missing Data',
                         message='Not Acceptable - Missing STUDENT_ID Post Value.'
                         ), 406)
 
     # Error if Snapshot Name Post Variable Missing
-    if not SNAPSHOT_NAME:
+    if not snapshot_name:
         return (jsonify(status=406,
                         error='Not Acceptable - Missing Data',
                         message='Not Acceptable - Missing SNAPSHOT_NAME Post Value.'
                         ), 406)
 
     # Error if Snapshot File Name Post Variable Missing
-    if not SNAPSHOT_FILENAME:
+    if not snapshot_filename:
         return (jsonify(status=406,
                         error='Not Acceptable - Missing Data',
                         message='Not Acceptable - Missing SNAPSHOT_FILENAME Post Value.'
                         ), 406)
 
-    SNAP_STUDENT_PATH = SNAPDIR + STUDENT_ID  # Student Snapshot Directory Path
-    SNAP_NAME_PATH = SNAP_STUDENT_PATH + '/' + SNAPSHOT_NAME  # Student Snapshot Path
-    SNAP_FILE_PATH = SNAP_NAME_PATH + '/' + SNAPSHOT_FILENAME  # Student Snapshot File Path
+    snap_student_path = SNAPSHOT_DIR + student_id  # Student Snapshot Directory Path
+    snap_name_path = snap_student_path + '/' + snapshot_name  # Student Snapshot Path
+    snap_file_path = snap_name_path + '/' + snapshot_filename  # Student Snapshot File Path
 
-    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
-    SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
-    SNAP_FILE_PATH_OBJ = Path(SNAP_FILE_PATH)  # Student Snapshot File Path Object
+    snap_student_path_obj = Path(snap_student_path)  # Student Snapshot Directory Path Object
+    snap_name_path_obj = Path(snap_name_path)  # Student Snapshot Path Object
+    snap_file_path_obj = Path(snap_file_path)  # Student Snapshot File Path Object
 
     # Error if Snapshot Directory Does Not Exist
-    if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
+    if not (snap_student_path_obj.exists() and snap_student_path_obj.is_dir()):
         return (jsonify(status=404,
                         error='Not Found - Snapshot Directory was Not Found',
                         message='Not Found - Student Snapshot Directory Not Found.'
                         ), 404)
 
     # Error if Specific Snapshot Does Not Exist
-    if not (SNAP_NAME_PATH_OBJ.exists()
-            and SNAP_NAME_PATH_OBJ.is_dir()):
+    if not (snap_name_path_obj.exists()
+            and snap_name_path_obj.is_dir()):
         return (jsonify(status=404,
                         error='Not Found - Snapshot was Not Found',
                         message='Not Found - Snapshot Not Found.'), 404)
 
     # Error if Requested Snapshot File Does Not Exist
-    if not (SNAP_FILE_PATH_OBJ.exists()
-            and SNAP_FILE_PATH_OBJ.is_file()):
+    if not (snap_file_path_obj.exists()
+            and snap_file_path_obj.is_file()):
         return (jsonify(status=404,
                         error='Not Found - Snapshot File was Not Found',
                         message='Not Found - Snapshot File Not Found.'), 404)
 
-    SNAPSHOT_FILE_EXTENSION = SNAPSHOT_FILENAME.rsplit('.', 1)[-1]  # File Extension
-    if '/' in SNAPSHOT_FILENAME:  # Get File Name Without Directory
-        SNAPSHOT_SHORT_FILENAME = SNAPSHOT_FILENAME.rsplit('/', 1)[-1]
+    snapshot_file_extension = snapshot_filename.rsplit('.', 1)[-1]  # File Extension
+    if '/' in snapshot_filename:  # Get File Name Without Directory
+        snapshot_short_filename = snapshot_filename.rsplit('/', 1)[-1]
     else:
-        SNAPSHOT_SHORT_FILENAME = SNAPSHOT_FILENAME
+        snapshot_short_filename = snapshot_filename
 
-    with open(SNAP_FILE_PATH, 'rb') as OPEN_FILE:  # Open Snapshot File and Read it into the File Variable
-        SNAPSHOT_FILE_BYTES = OPEN_FILE.read()
+    with open(snap_file_path, 'rb') as OPEN_FILE:  # Open Snapshot File and Read it into the File Variable
+        snapshot_file_bytes = OPEN_FILE.read()
 
     # Create Response With Requested File
-    response = make_response(SNAPSHOT_FILE_BYTES)  # Includes the Snapshot File into the Response
+    response = make_response(snapshot_file_bytes)  # Includes the Snapshot File into the Response
     response.headers.set('Content-Type',
-                         SNAPSHOT_FILE_EXTENSION)  # Sets the Response Content-Type to File Extension of Snapshot File
+                         snapshot_file_extension)  # Sets the Response Content-Type to File Extension of Snapshot File
     # Sets the Response Content-Disposition to Attachment and Includes the File Name
     response.headers.set('Content-Disposition', 'attachment',
-                         filename='%s' % SNAPSHOT_SHORT_FILENAME)
+                         filename='%s' % snapshot_short_filename)
 
     # Return Response with Requested Snapshot File
     return response
@@ -387,11 +387,11 @@ def get_snapshot_zip():
                         message='Not Acceptable - Missing SNAPSHOT_NAME Post Value.'
                         ), 406)
     if student_id:
-        snap_path = SNAPDIR + student_id  # Student Snapshot Directory Path
+        snap_path = SNAPSHOT_DIR + student_id  # Student Snapshot Directory Path
         snap_name_path = snap_path + '/' + snapshot_name  # Student Snapshot Path
         zip_file_name = student_id + '_' + snapshot_name + '.zip'  # Snapshot Zip File Name
     else:
-        snap_path = SNAPDIR  # Student Snapshot Directory Path
+        snap_path = SNAPSHOT_DIR  # Student Snapshot Directory Path
         snap_name_path = snap_path + '/' + snapshot_name  # Student Snapshot Path
         zip_file_name = snapshot_name + '.zip'  # Snapshot Zip File Name
 
@@ -417,12 +417,12 @@ def get_snapshot_zip():
     with zf.ZipFile(snap_file, 'w') as SNAP_ZIP_FILE:  # Open Empty File as Zip File Object for Writing
         for (dirname, subdirs, files) in os.walk(snap_name_path + '/'):  # Loop Through Snapshot Files and Directories
             if "/." not in dirname:
-                SNAP_ZIP_FILE.write(dirname, dirname.replace(SNAPDIR, ''))  # Add Directory to Zip File Object
+                SNAP_ZIP_FILE.write(dirname, dirname.replace(SNAPSHOT_DIR, ''))  # Add Directory to Zip File Object
                 for filename in files:  # Loop Through Each File in Snapshot Directory
                     if "/." not in filename:
                         SNAP_ZIP_FILE.write(os.path.join(dirname, filename),
                                             os.path.join(dirname,
-                                                         filename).replace(SNAPDIR, ''),
+                                                         filename).replace(SNAPSHOT_DIR, ''),
                                             zf.ZIP_DEFLATED)  # Add Snapshot File To Zip File Object
         SNAP_ZIP_FILE.close()  # Finish Writing to Zip File Object
     snap_file.seek(0)  # Reset position of Snap Zip File to Beginning
@@ -450,55 +450,55 @@ def get_snapshot_zip():
 def put_student_report():
     """ Put Specified File into Specified Student Home Directory. """
 
-    STUDENT_ID = request.form.get('STUDENT_ID')  # StudentID Post Variable
-    FILE_DATA = request.files['UPLOAD_FILE']  # File Uploaded Data Post Variable
-    FILE_NAME = secure_filename(FILE_DATA.filename)  # Name of File Uploaded Data
+    student_id = request.form.get('STUDENT_ID')  # StudentID Post Variable
+    file_data = request.files['UPLOAD_FILE']  # File Uploaded Data Post Variable
+    file_name = secure_filename(file_data.filename)  # Name of File Uploaded Data
 
     # Error if StudentID Post Variable Missing
-    if not STUDENT_ID:
+    if not student_id:
         return (jsonify(status=406,
                         error='Not Acceptable - Missing Data',
                         message='Not Acceptable - Missing STUDENT_ID Post Value.'
                         ), 406)
 
     # Error if No Data in UPLOAD_FILE Post Variable
-    if not FILE_DATA:
+    if not file_data:
         return (jsonify(status=406,
                         error='Not Acceptable - Missing Data',
                         message='Not Acceptable - Missing File Upload Post Data.'
                         ), 406)
 
     # Error if No Filename for UPLOAD_FILE Post Variable
-    if not FILE_NAME:
+    if not file_name:
         return (jsonify(status=406,
                         error='Not Acceptable - Missing Data',
                         message='Not Acceptable - Missing File Name Value.'),
                 406)
 
-    TEMP_FILE_NAME = uuid.uuid4().hex  # Unique Temp File Name
-    STUDENT_PATH = HOMEDIR + STUDENT_ID  # Student Home Directory Path
-    STUDENT_FILE_PATH = STUDENT_PATH + '/' + FILE_NAME  # Student Home File Path
+    temp_file_name = uuid.uuid4().hex  # Unique Temp File Name
+    student_path = HOMEDIR + student_id  # Student Home Directory Path
+    student_file_path = student_path + '/' + file_name  # Student Home File Path
 
-    STUDENT_PATH_OBJ = Path(STUDENT_PATH)  # Student Home Directory Path Object
-    STUDENT_FILE_PATH_OBJ = Path(STUDENT_FILE_PATH)  # Student Uploaded File Path Object
+    student_path_obj = Path(student_path)  # Student Home Directory Path Object
+    student_file_path_obj = Path(student_file_path)  # Student Uploaded File Path Object
 
     # Error if Student Home Does Not Exist
-    if not (STUDENT_PATH_OBJ.exists() and STUDENT_PATH_OBJ.is_dir()):
+    if not (student_path_obj.exists() and student_path_obj.is_dir()):
         return (jsonify(status=404,
                         error='Not Found - Student Directory Not Found',
                         message='Not Found - STUDENT_ID Home Directory was Not Found.'
                         ), 404)
 
     # Error if File Already Exists In Student Home Directory
-    if STUDENT_FILE_PATH_OBJ.exists():
+    if student_file_path_obj.exists():
         return (jsonify(status=417,
                         error='Expectation Failed - Uploaded File Already Exists'
                         ,
                         message='Expectation Failed - The File Uploaded Already Exists within the Student\'s Home Directory.'
-                                + STUDENT_FILE_PATH), 417)
+                                + student_file_path), 417)
 
     # Error if Uploaded File Extension Not in Allowed Extensions List
-    if not ('.' in FILE_NAME and FILE_NAME.rsplit('.', 1)[1].lower()
+    if not ('.' in file_name and file_name.rsplit('.', 1)[1].lower()
             in ALLOWED_EXTENSIONS):
         return (jsonify(status=417,
                         error='Expectation Failed - Invalid Uploaded File Type'
@@ -507,15 +507,15 @@ def put_student_report():
                                 + str(ALLOWED_EXTENSIONS) + ' file types.'), 417)
 
     # Save File with Temp Name to Upload Directory
-    FILE_DATA.save(os.path.join(app.config['UPLOAD_FOLDER'],
-                                TEMP_FILE_NAME))
+    file_data.save(os.path.join(app.config['UPLOAD_FOLDER'],
+                                temp_file_name))
 
     # Move & Rename File from Upload Directory with Temp Name to Student Home Directory with Actual Name
     shutil.move(os.path.join(app.config['UPLOAD_FOLDER'],
-                             TEMP_FILE_NAME), STUDENT_FILE_PATH)
+                             temp_file_name), student_file_path)
 
     # Return Success Message
-    return jsonify('Success - File Uploaded - ' + FILE_NAME), 200
+    return jsonify('Success - File Uploaded - ' + file_name), 200
 
 
 #
@@ -532,42 +532,42 @@ def put_student_report():
 def snapshot():
     """ Create a Snapshot of the Specified Student's Home Directory with the Specified Snapshot Name. """
 
-    STUDENT_ID = request.form.get('STUDENT_ID')  # StudentID Post Variable
-    SNAPSHOT_NAME = request.form.get('SNAPSHOT_NAME')  # SNAPSHOT_NAME Post Variable
+    student_id = request.form.get('STUDENT_ID')  # StudentID Post Variable
+    snapshot_name = request.form.get('SNAPSHOT_NAME')  # SNAPSHOT_NAME Post Variable
 
-    DATE = datetime.datetime.now()  # Get Current Date
-    DATE = DATE.isoformat()  # Convert to ISO Format Date
-    DATE = DATE[0:10]  # Trim Time from ISO Date
+    date = datetime.datetime.now()  # Get Current Date
+    date = date.isoformat()  # Convert to ISO Format Date
+    date = date[0:10]  # Trim Time from ISO Date
 
     # Error if StudentID Post Variable Missing
-    if not STUDENT_ID:
+    if not student_id:
         return (jsonify(status=406,
                         error='Not Acceptable - Missing Data',
                         message='Not Acceptable - Missing STUDENT_ID Post Value.'
                         ), 406)
 
     # Error if SNAPSHOT_NAME Post Variable Missing
-    if not SNAPSHOT_NAME:
+    if not snapshot_name:
         return (jsonify(status=406,
                         error='Not Acceptable - Missing Data',
                         message='Not Acceptable - Missing SNAPSHOT_NAME Post Value.'
                         ), 406)
 
-    SNAPSHOT_NAME_CLEAN = slugify(SNAPSHOT_NAME)  # Ensure The SNAPSHOT_NAME is a Safe Filename
-    SNAPSHOT_NAME_CLEAN = SNAPSHOT_NAME_CLEAN + '_' + DATE  # Add Date to SNAPSHOT_NAME_CLEAN
+    snapshot_name_clean = slugify(snapshot_name)  # Ensure The SNAPSHOT_NAME is a Safe Filename
+    snapshot_name_clean = snapshot_name_clean + '_' + date  # Add Date to SNAPSHOT_NAME_CLEAN
 
-    STUDENT_PATH = HOMEDIR + STUDENT_ID  # Student Home Directory Path
-    SNAP_STUDENT_PATH = SNAPDIR + STUDENT_ID  # Student Snapshot Directory Path
-    SNAP_NAME_PATH = SNAP_STUDENT_PATH + '/' + SNAPSHOT_NAME_CLEAN  # Student Snapshot Path
-    LOCKFILE = '/var/lock/' + COURSECODE + '_' + STUDENT_ID + '.lock'  # Lock File For Student
-    INTSNAP_STUDENT_PATH = INTSNAPDIR + STUDENT_ID
+    student_path = HOMEDIR + student_id  # Student Home Directory Path
+    snap_student_path = SNAPSHOT_DIR + student_id  # Student Snapshot Directory Path
+    snap_name_path = snap_student_path + '/' + snapshot_name_clean  # Student Snapshot Path
+    lockfile = '/var/lock/' + COURSE_CODE + '_' + student_id + '.lock'  # Lock File For Student
+    intsnap_student_path = INTERMEDIARY_DIR + student_id
 
-    STUDENT_PATH_OBJ = Path(STUDENT_PATH)  # Student Home Directory Path Object
-    SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
-    SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
+    student_path_obj = Path(student_path)  # Student Home Directory Path Object
+    snap_student_path_obj = Path(snap_student_path)  # Student Snapshot Directory Path Object
+    snap_name_path_obj = Path(snap_name_path)  # Student Snapshot Path Object
 
     # Error if Student Home Does Not Exist
-    if not (STUDENT_PATH_OBJ.exists() and STUDENT_PATH_OBJ.is_dir()):
+    if not (student_path_obj.exists() and student_path_obj.is_dir()):
         return (jsonify(status=404,
                         error='Not Found - Student Directory Not Found',
                         message='Not Found - STUDENT_ID Home Directory was Not Found.'
@@ -581,8 +581,8 @@ def snapshot():
     #                ), 404)
 
     # Error if Specific Snapshot Already Exists
-    if (SNAP_NAME_PATH_OBJ.exists()
-            and SNAP_NAME_PATH_OBJ.is_dir()):
+    if (snap_name_path_obj.exists()
+            and snap_name_path_obj.is_dir()):
         return (jsonify(status=404,
                         error='Already Exists - Snapshot Name Already Exists',
                         message='Already Exists - Student Snapshot Already Exists.'), 404)
@@ -590,31 +590,31 @@ def snapshot():
     # Create FLOCK or Wait 2 Seconds
     while True:
         try:
-            LOCKFILE_OBJ = open(LOCKFILE, 'w+')  # Open Lock File, Create if Does Not Exist
-            fcntl.flock(LOCKFILE_OBJ, fcntl.LOCK_EX | fcntl.LOCK_NB)  # Create Non Blocking Exclusive Flock
+            lockfile_obj = open(lockfile, 'w+')  # Open Lock File, Create if Does Not Exist
+            fcntl.flock(lockfile_obj, fcntl.LOCK_EX | fcntl.LOCK_NB)  # Create Non Blocking Exclusive Flock
             break  # Break Out of While Loop if no Errors
         except:
             time.sleep(2)
 
     # Create Student Home Directory Structure to Final Snapshot Directory If Missing
-    Path(SNAP_STUDENT_PATH).mkdir(parents=True, exist_ok=True)
+    Path(snap_student_path).mkdir(parents=True, exist_ok=True)
 
     # RSYNC Student Home to Intermediate Snapshot Directory
-    sysrsync.run(source=STUDENT_PATH,
-                 destination=INTSNAP_STUDENT_PATH,
+    sysrsync.run(source=student_path,
+                 destination=intsnap_student_path,
                  sync_source_contents=True,
                  options=['-a', '-v', '-h', '-W', '--no-compress'])
 
     # Move Int Snap to Final Snap Location with New Name
-    shutil.move(INTSNAP_STUDENT_PATH, SNAP_NAME_PATH)
+    shutil.move(intsnap_student_path, snap_name_path)
 
     # Unlock Flock
-    fcntl.flock(LOCKFILE_OBJ, fcntl.LOCK_UN)
-    LOCKFILE_OBJ.close()
-    os.remove(LOCKFILE)
+    fcntl.flock(lockfile_obj, fcntl.LOCK_UN)
+    lockfile_obj.close()
+    os.remove(lockfile)
 
     # Return Success Message
-    return jsonify('Success - Snapshot Created - ' + SNAPSHOT_NAME_CLEAN + ' for Student: ' + STUDENT_ID), 200
+    return jsonify('Success - Snapshot Created - ' + snapshot_name_clean + ' for Student: ' + student_id), 200
 
 
 #
@@ -632,34 +632,34 @@ def snapshot():
 def snapshot_all():
     """ Create a Snapshot of tll the Student's Home Directories with the Specified Snapshot Name. """
 
-    SNAPSHOT_NAME = request.form.get('SNAPSHOT_NAME')  # SNAPSHOT_NAME Post Variable
+    snapshot_name = request.form.get('SNAPSHOT_NAME')  # SNAPSHOT_NAME Post Variable
 
-    DATE = datetime.datetime.now()  # Get Current Date
-    DATE = DATE.isoformat()  # Convert to ISO Format Date
-    DATE = DATE[0:10]  # Trim Time from ISO Date
+    date = datetime.datetime.now()  # Get Current Date
+    date = date.isoformat()  # Convert to ISO Format Date
+    date = date[0:10]  # Trim Time from ISO Date
 
     # Error if SNAPSHOT_NAME Post Variable Missing
-    if not SNAPSHOT_NAME:
+    if not snapshot_name:
         return (jsonify(status=406,
                         error='Not Acceptable - Missing Data',
                         message='Not Acceptable - Missing SNAPSHOT_NAME Post Value.'
                         ), 406)
 
     # Get List of Directories in Student Snapshot Directory
-    STUDENTS = [f.path for f in os.scandir(HOMEDIR) if f.is_dir()]
-    STUDENTS = [x for x in STUDENTS if '.' not in x]
-    STUDENTS = [s.replace(HOMEDIR, '') for s in STUDENTS]
+    students = [f.path for f in os.scandir(HOMEDIR) if f.is_dir()]
+    students = [x for x in students if '.' not in x]
+    students = [s.replace(HOMEDIR, '') for s in students]
 
-    SNAPSHOT_NAME_CLEAN = slugify(SNAPSHOT_NAME)  # Ensure The SNAPSHOT_NAME is a Safe Filename
-    SNAPSHOT_NAME_CLEAN = SNAPSHOT_NAME_CLEAN + '_' + DATE  # Add Date to SNAPSHOT_NAME_CLEAN
+    snapshot_name_clean = slugify(snapshot_name)  # Ensure The SNAPSHOT_NAME is a Safe Filename
+    snapshot_name_clean = snapshot_name_clean + '_' + date  # Add Date to SNAPSHOT_NAME_CLEAN
 
     # Check All Students Snapshot Directories that the Snapshot Does Not Exist
-    for STUDENT in STUDENTS:
-        SNAP_STUDENT_PATH = SNAPDIR + STUDENT  # Student Snapshot Directory Path
-        SNAP_NAME_PATH = SNAP_STUDENT_PATH + '/' + SNAPSHOT_NAME_CLEAN  # Student Snapshot Path
+    for student in students:
+        snap_student_path = SNAPSHOT_DIR + student  # Student Snapshot Directory Path
+        snap_name_path = snap_student_path + '/' + snapshot_name_clean  # Student Snapshot Path
 
-        SNAP_STUDENT_PATH_OBJ = Path(SNAP_STUDENT_PATH)  # Student Snapshot Directory Path Object
-        SNAP_NAME_PATH_OBJ = Path(SNAP_NAME_PATH)  # Student Snapshot Path Object
+        snap_student_path_obj = Path(snap_student_path)  # Student Snapshot Directory Path Object
+        snap_name_path_obj = Path(snap_name_path)  # Student Snapshot Path Object
 
         # Error if Student Snapshot Directory Does Not Exist
         #        if not (SNAP_STUDENT_PATH_OBJ.exists() and SNAP_STUDENT_PATH_OBJ.is_dir()):
@@ -669,47 +669,47 @@ def snapshot_all():
         #                ), 404)
 
         # Error if Specific Snapshot Already Exists
-        if SNAP_NAME_PATH_OBJ.exists() and SNAP_NAME_PATH_OBJ.is_dir():
+        if snap_name_path_obj.exists() and snap_name_path_obj.is_dir():
             return (jsonify(status=404,
                             error='Already Exists - Snapshot Name Already Exists',
-                            message='Already Exists - Student (' + STUDENT + ') Snapshot Already Exists.'), 404)
+                            message='Already Exists - Student (' + student + ') Snapshot Already Exists.'), 404)
 
     # Create Snapshots for All Students
-    for STUDENT in STUDENTS:
-        STUDENT_PATH = HOMEDIR + STUDENT  # Student Home Directory Path
-        SNAP_STUDENT_PATH = SNAPDIR + STUDENT  # Student Snapshot Directory Path
-        SNAP_NAME_PATH = SNAP_STUDENT_PATH + '/' + SNAPSHOT_NAME_CLEAN  # Student Snapshot Path
-        LOCKFILE = '/var/lock/' + COURSECODE + '_' + STUDENT + '.lock'  # Lock File For Student
-        INTSNAP_STUDENT_PATH = INTSNAPDIR + STUDENT
+    for student in students:
+        student_path = HOMEDIR + student  # Student Home Directory Path
+        snap_student_path = SNAPSHOT_DIR + student  # Student Snapshot Directory Path
+        snap_name_path = snap_student_path + '/' + snapshot_name_clean  # Student Snapshot Path
+        lockfile = '/var/lock/' + COURSE_CODE + '_' + student + '.lock'  # Lock File For Student
+        intsnap_student_path = INTERMEDIARY_DIR + student
 
         # Create FLOCK or Wait 2 Seconds
         while True:
             try:
-                LOCKFILE_OBJ = open(LOCKFILE, 'w+')  # Open Lock File, Create if Does Not Exist
-                fcntl.flock(LOCKFILE_OBJ, fcntl.LOCK_EX | fcntl.LOCK_NB)  # Create Non Blocking Exclusive Flock
+                lockfile_obj = open(lockfile, 'w+')  # Open Lock File, Create if Does Not Exist
+                fcntl.flock(lockfile_obj, fcntl.LOCK_EX | fcntl.LOCK_NB)  # Create Non Blocking Exclusive Flock
                 break  # Break Out of While Loop if no Errors
             except:
                 time.sleep(2)
 
         # Create Student Home Directory Structure to Final Snapshot Directory If Missing
-        Path(SNAP_STUDENT_PATH).mkdir(parents=True, exist_ok=True)
+        Path(snap_student_path).mkdir(parents=True, exist_ok=True)
 
         # RSYNC Student Home to Intermediate Snapshot Directory
-        sysrsync.run(source=STUDENT_PATH,
-                     destination=INTSNAP_STUDENT_PATH,
+        sysrsync.run(source=student_path,
+                     destination=intsnap_student_path,
                      sync_source_contents=True,
                      options=['-a', '-v', '-h', '-W', '--no-compress'])
 
         # Move Int Snap to Final Snap Location with New Name
-        shutil.move(INTSNAP_STUDENT_PATH, SNAP_NAME_PATH)
+        shutil.move(intsnap_student_path, snap_name_path)
 
         # Unlock Flock
-        fcntl.flock(LOCKFILE_OBJ, fcntl.LOCK_UN)
-        LOCKFILE_OBJ.close()
-        os.remove(LOCKFILE)
+        fcntl.flock(lockfile_obj, fcntl.LOCK_UN)
+        lockfile_obj.close()
+        os.remove(lockfile)
 
     # Return Success Message
-    return jsonify('Success - Snapshot Created - ' + SNAPSHOT_NAME_CLEAN + ' for All Students'), 200
+    return jsonify('Success - Snapshot Created - ' + snapshot_name_clean + ' for All Students'), 200
 
 
 if __name__ == '__main__':

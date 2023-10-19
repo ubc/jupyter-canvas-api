@@ -15,23 +15,10 @@ ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
 dpkg-reconfigure -f noninteractive tzdata && \
 apt-get clean
 # Package Installation Command
-RUN APT_INSTALL="apt-get install -y " && \
-	apt-get update && \
-# ======================================================================
-# Apt Packages
-# ----------------------------------------------------------------------
-	SYSTEM_PACKAGES=noninteractive $APT_INSTALL \
-	        software-properties-common \
-		build-essential \
-		apt-utils \
+RUN apt-get update && \
+	SYSTEM_PACKAGES=noninteractive apt-get install -y \
 		ca-certificates \
-		wget \
-		git \
-		curl \
 		rsync \
-		vim \
-#		python3 \
-#		python3-pip \
 		cron \
 		zip \
 		unzip \
