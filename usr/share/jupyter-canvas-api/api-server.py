@@ -15,6 +15,7 @@ import glob
 import io
 import logging
 import os
+import pathlib
 import re
 import shutil
 import time
@@ -390,41 +391,66 @@ def get_snapshot_zip():
         snap_path = SNAPSHOT_DIR + student_id  # Student Snapshot Directory Path
         snap_name_path = snap_path + '/' + snapshot_name  # Student Snapshot Path
         zip_file_name = student_id + '_' + snapshot_name + '.zip'  # Snapshot Zip File Name
+
+        snap_student_path_obj = Path(snap_path)  # Student Snapshot Directory Path Object
+        snap_name_path_obj = Path(snap_name_path)  # Student Snapshot Path Object
+
+        # Error if Student Snapshot Directory Does Not Exist
+        if not (snap_student_path_obj.exists() and snap_student_path_obj.is_dir()):
+            return (jsonify(status=404,
+                            error='Not Found - Snapshot Directory was Not Found',
+                            message='Not Found - Student Snapshot Directory Not Found.'
+                            ), 404)
+
+        # Error if Specific Snapshot Does Not Exist
+        if not (snap_name_path_obj.exists()
+                and snap_name_path_obj.is_dir()):
+            return (jsonify(status=404,
+                            error='Not Found - Snapshot was Not Found',
+                            message='Not Found - Snapshot Not Found.'), 404)
+
+        # Create Zip File of Snapshot with Relative Path
+        snap_file = io.BytesIO()  # Create Empty File In Memory
+        with zf.ZipFile(snap_file, 'w') as snap_zip_file:  # Open Empty File as Zip File Object for Writing
+            for (dirname, subdirs, files) in os.walk(snap_name_path + '/'):  # Loop Through Snapshot Files and Directories
+                if "/." not in dirname:
+                    snap_zip_file.write(dirname, dirname.replace(SNAPSHOT_DIR, ''))  # Add Directory to Zip File Object
+                    for filename in files:  # Loop Through Each File in Snapshot Directory
+                        if "/." not in filename:
+                            snap_zip_file.write(os.path.join(dirname, filename),
+                                                os.path.join(dirname,
+                                                             filename).replace(SNAPSHOT_DIR, ''),
+                                                zf.ZIP_DEFLATED)  # Add Snapshot File To Zip File Object
+            snap_zip_file.close()  # Finish Writing to Zip File Object
     else:
         snap_path = SNAPSHOT_DIR  # Student Snapshot Directory Path
         snap_name_path = snap_path + '/' + snapshot_name  # Student Snapshot Path
         zip_file_name = snapshot_name + '.zip'  # Snapshot Zip File Name
+        snapshots = []
 
-    snap_student_path_obj = Path(snap_path)  # Student Snapshot Directory Path Object
-    snap_name_path_obj = Path(snap_name_path)  # Student Snapshot Path Object
+        # loop through students directories to find which one has the snapshot
+        with os.scandir(snap_path) as student_dir:
+            for entry in student_dir:
+                if entry.is_dir():
+                    with os.scandir(entry) as snapshot_dir:
+                        for e in snapshot_dir:
+                            # find the snapshot
+                            if e.is_dir() and e.name == snapshot_name:
+                                snapshots.append(e.path)
 
-    # Error if Student Snapshot Directory Does Not Exist
-    if not (snap_student_path_obj.exists() and snap_student_path_obj.is_dir()):
-        return (jsonify(status=404,
-                        error='Not Found - Snapshot Directory was Not Found',
-                        message='Not Found - Student Snapshot Directory Not Found.'
-                        ), 404)
+        # Create Zip File of Snapshot with Relative Path
+        snap_file = io.BytesIO()  # Create Empty File In Memory
+        with zf.ZipFile(snap_file, 'w') as snap_zip_file:  # Open Empty File as Zip File Object for Writing
+            for snapshot in snapshots:
+                directory = pathlib.Path(snapshot)
+                for file_path in directory.rglob("*"):
+                    snap_zip_file.write(
+                        file_path,
+                        arcname=str(file_path.relative_to(snap_path)).replace(snapshot_name+'/', ''),
+                        compress_type=zf.ZIP_DEFLATED
+                    )
+        snap_zip_file.close()  # Finish Writing to Zip File Object
 
-    # Error if Specific Snapshot Does Not Exist
-    if not (snap_name_path_obj.exists()
-            and snap_name_path_obj.is_dir()):
-        return (jsonify(status=404,
-                        error='Not Found - Snapshot was Not Found',
-                        message='Not Found - Snapshot Not Found.'), 404)
-
-    # Create Zip File of Snapshot with Relative Path
-    snap_file = io.BytesIO()  # Create Empty File In Memory
-    with zf.ZipFile(snap_file, 'w') as SNAP_ZIP_FILE:  # Open Empty File as Zip File Object for Writing
-        for (dirname, subdirs, files) in os.walk(snap_name_path + '/'):  # Loop Through Snapshot Files and Directories
-            if "/." not in dirname:
-                SNAP_ZIP_FILE.write(dirname, dirname.replace(SNAPSHOT_DIR, ''))  # Add Directory to Zip File Object
-                for filename in files:  # Loop Through Each File in Snapshot Directory
-                    if "/." not in filename:
-                        SNAP_ZIP_FILE.write(os.path.join(dirname, filename),
-                                            os.path.join(dirname,
-                                                         filename).replace(SNAPSHOT_DIR, ''),
-                                            zf.ZIP_DEFLATED)  # Add Snapshot File To Zip File Object
-        SNAP_ZIP_FILE.close()  # Finish Writing to Zip File Object
     snap_file.seek(0)  # Reset position of Snap Zip File to Beginning
 
     response = make_response(snap_file.read())  # Includes the Zip File into the Response
