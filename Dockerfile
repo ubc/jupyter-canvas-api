@@ -39,9 +39,11 @@ EXPOSE 5000
 COPY usr/share/jupyter-canvas-api/api-server.py /usr/share/jupyter-canvas-api/api-server.py
 COPY usr/share/jupyter-canvas-api/requirements.txt /usr/share/jupyter-canvas-api/requirements.txt
 COPY usr/local/bin/hourly-rsync.sh /etc/cron.hourly/hourly-api-rsync
+COPY docker-entrypoint.sh /
 RUN mkdir /mnt/efs
 RUN chmod +x /etc/cron.hourly/hourly-api-rsync
 RUN touch /etc/crontab /etc/cron.*/*
 WORKDIR /usr/share/jupyter-canvas-api/
 RUN pip3 install -r /usr/share/jupyter-canvas-api/requirements.txt
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD printenv | grep -v "no_proxy" > /etc/environment && /etc/init.d/cron start && python3 -u /usr/share/jupyter-canvas-api/api-server.py

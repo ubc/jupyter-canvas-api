@@ -11,7 +11,7 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLabels:     
+    matchLabels:
       run: jupyterhub-api-app
       app: jhub-api
       organization: ubc
@@ -34,10 +34,10 @@ spec:
           memory: 2G
          limits:
           cpu: "500m"
-          memory: 2G 
+          memory: 2G
         env:
         - name: JUPYTER_API_KEY
-          valueFrom: 
+          valueFrom:
              secretKeyRef:
                 name: jupyterhub-api-key
                 key: jupyterhub-api-key
@@ -49,12 +49,13 @@ spec:
           value: "5000"
         - name: JUPYTER_API_HOST
           value: "0.0.0.0"
-        - name: JNOTE_HOME
-          value: "/mnt/efs/dsci-100-home/"
-        - name: JNOTE_SNAP
-          value: "/mnt/efs/dsci-100-snap/"         
-        - name: JNOTE_INTSNAP
-          value: "/mnt/efs/dsci-100-internal/"   
+          # optional, to override default values
+#        - name: JNOTE_HOME
+#          value: "/mnt/efs/dsci-100-home/"
+#        - name: JNOTE_SNAP
+#          value: "/mnt/efs/dsci-100-snap/"
+#        - name: JNOTE_INTSNAP
+#          value: "/mnt/efs/dsci-100-internal/"
         ports:
          - containerPort: 5000
         volumeMounts:
