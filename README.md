@@ -366,19 +366,11 @@ Creates a Snapshot of the all students home directories with a common name, with
 
 #### Required Headers & Post Variables:
 
-<table>
-    <tr>
-        <td><strong>X-Api-Key</strong></td>
-        <td>Header Variable</td>
-        <td>The API Key is Provided by UBC IT</td>
-    </tr>
-    <tr></tr>
-    <tr>
-        <td><strong>SNAPSHOT_NAME</strong></td>
-        <td>Post Variable</td>
-        <td>The Name of the Snapshot</td>
-    </tr>
-</table>
+|                |                 |                                       |
+|----------------|-----------------|---------------------------------------|
+| X-Api-Key      | Header Variable | The API Key is Provided by UBC IT     |
+| SNAPSHOT_NAME  | Post Variable   | The Name of the Snapshot              |
+| INCLUDE_HIDDEN | Post Variable   | Whether to include hidden directories |
 
 #### Curl Command Call Examples:
 
@@ -397,68 +389,17 @@ user@host:~$
 
 ## Environment Variables
 
-<div>
-  <table>
-    <thead>
-      <tr>
-        <th>Environment Variable</th>
-        <th>Required</th>
-        <th>Default Value</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>DEBUG</td>
-        <td align="center"></td>
-        <td>TRUE</td>
-        <td>Enables Debug output within the API code</td>
-      </tr>
-      <tr>
-        <td>JUPYTER_API_PORT</td>
-        <td align="center"></td>
-        <td>5000</td>
-        <td>The Port Number of the API</td>
-      </tr>
-      <tr>
-        <td>JUPYTER_API_HOST</td>
-        <td align="center"></td>
-        <td>0.0.0.0</td>
-        <td>The IP the API is being served on</td>
-      </tr>
-      <tr>
-        <td>JUPYTER_API_KEY</td>
-        <td align="center">&check; </td>
-        <td>12345</td>
-        <td>The API Key</td>
-      </tr>
-      <tr>
-        <td>JNOTE_HOME</td>
-        <td align="center">&check; </td>
-        <td>{No Default Value}</td>
-        <td>The location of Jupyter Notebooks' user Home directory</td>
-      </tr>
-      <tr>
-        <td>JNOTE_SNAP</td>
-        <td align="center">&check; </td>
-        <td>{No Default Value}</td>
-        <td>The location of Jupyter Notebooks final Snapshot directory</td>
-      </tr>
-      <tr>
-        <td>JNOTE_INTSNAP</td>
-        <td align="center">&check; </td>
-        <td>{No Default Value}</td>
-        <td>The location of Jupyter Notebooks internal Snapshot directory</td>
-      </tr>
-      <tr>
-        <td>JNOTE_COURSE_CODE</td>
-        <td align="center">&check; </td>
-        <td>{No Default Value}</td>
-        <td>The Course Code</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+| Environment Variable | Required | Default Value                            | Description                                                   |
+|----------------------|----------|------------------------------------------|---------------------------------------------------------------|
+| DEBUG                | TRUE     | Enables Debug output within the API code |
+| JUPYTER_API_PORT     | 5000     | The Port Number of the API               |
+| JUPYTER_API_HOST     | 0.0.0.0  | The IP the API is being served on        |
+| JUPYTER_API_KEY      | &check;  | 12345                                    | The API Key                                                   |
+| JNOTE_HOME           | &check;  | {No Default Value}                       | The location of Jupyter Notebooks' user Home directory        |
+| JNOTE_SNAP           | &check;  | {No Default Value}                       | The location of Jupyter Notebooks final Snapshot directory    |
+| JNOTE_INTSNAP        | &check;  | {No Default Value}                       | The location of Jupyter Notebooks internal Snapshot directory |
+| JNOTE_COURSE_CODE    | &check;  | {No Default Value}                       | The Course Code                                               |
+
 
 
 ## Repo Files

@@ -45,9 +45,9 @@ DEBUG = os.getenv('FLASK_DEBUG', 'False') == 'True'  # API Debug
 PORT = int(os.getenv('JUPYTER_API_PORT', '5000'))  # API TCP Port Number
 HOST = str(os.getenv('JUPYTER_API_HOST', '0.0.0.0'))  # API TCP Address
 APIKEY = str(os.getenv('JUPYTER_API_KEY', '12345'))  # API Key Value
-HOMEDIR = str(os.getenv('JNOTE_HOME', '/mnt/efs/stat-100a-home/'))  # Home Directory Root
-SNAPSHOT_DIR = str(os.getenv('JNOTE_SNAP', '/mnt/efs/stat-100a-snap/'))  # Instructor Snapshot Directory
-INTERMEDIARY_DIR = str(os.getenv('JNOTE_INTSNAP', '/mnt/efs/stat-100a-internal/'))  # Intermediary Snapshot Directory
+HOMEDIR = os.path.join(str(os.getenv('JNOTE_HOME', '/mnt/efs/stat-100a-home/')), '')  # Home Directory Root
+SNAPSHOT_DIR = os.path.join(str(os.getenv('JNOTE_SNAP', '/mnt/efs/stat-100a-snap/')), '')  # Instructor Snapshot Directory
+INTERMEDIARY_DIR = os.path.join(str(os.getenv('JNOTE_INTSNAP', '/mnt/efs/stat-100a-internal/')), '')  # Intermediary Snapshot Directory
 all_directories = [HOMEDIR, SNAPSHOT_DIR, INTERMEDIARY_DIR]
 COURSE_CODE = str(os.getenv('JNOTE_COURSE_CODE', 'STAT100a'))  # The API Course Code
 
@@ -589,6 +589,8 @@ def snapshot():
 
     student_id = request.form.get('STUDENT_ID')  # StudentID Post Variable
     snapshot_name = request.form.get('SNAPSHOT_NAME')  # SNAPSHOT_NAME Post Variable
+    # whether to include hidden directories
+    include_hidden = request.form.get('INCLUDE_HIDDEN', "false").lower() == 'true'
 
     date = datetime.datetime.now()  # Get Current Date
     date = date.isoformat()  # Convert to ISO Format Date
@@ -654,11 +656,16 @@ def snapshot():
     # Create Student Home Directory Structure to Final Snapshot Directory If Missing
     Path(snap_student_path).mkdir(parents=True, exist_ok=True)
 
+    options = ['-a', '-v', '-h', '-W']
+    if include_hidden:
+        exclusions = None
+    else:
+        exclusions = ['.*']
     # RSYNC Student Home to Intermediate Snapshot Directory
     sysrsync.run(source=student_path,
                  destination=intsnap_student_path,
                  sync_source_contents=True,
-                 options=['-a', '-v', '-h', '-W', '--no-compress'])
+                 options=options, exclusions=exclusions)
 
     # Move Int Snap to Final Snap Location with New Name
     shutil.move(intsnap_student_path, snap_name_path)
@@ -675,12 +682,15 @@ def snapshot():
 #
 # Curl Usage Command Examples For '/snapshot_all' API Call
 # Required Post Variables: SNAPSHOT_NAME
+# Optional Post Variables: INCLUDE_HIDDEN
 # Required Header Variables: X-Api-Key
 # Example Response:
 #
 # curl -X POST -H "X-Api-Key: 12345" -F "STUDENT_NAME=assignment-1-snap-all" http://localhost:5000/snapshot_all
 # curl -X POST -H "X-Api-Key: 12345" -d "STUDENT_NAME=assignment-1-snap-all" http://localhost:5000/snapshot_all
 # curl -X POST -H "X-Api-Key: 12345" -data "STUDENT_NAME=assignment-1-snap-all" http://localhost:5000/snapshot_all
+# curl -X POST -H "X-Api-Key: 12345" -d "STUDENT_NAME=assignment-1-snap-all" -d "INCLUDE_HIDDEN=true"
+#      http://localhost:5000/snapshot_all
 #
 @app.route('/snapshot_all', methods=['POST'])
 @requires_apikey
@@ -689,6 +699,8 @@ def snapshot_all():
     """ Create a Snapshot of tll the Student's Home Directories with the Specified Snapshot Name. """
 
     snapshot_name = request.form.get('SNAPSHOT_NAME')  # SNAPSHOT_NAME Post Variable
+    # whether to include hidden directories
+    include_hidden = request.form.get('INCLUDE_HIDDEN', "false").lower() == 'true'
 
     date = datetime.datetime.now()  # Get Current Date
     date = date.isoformat()  # Convert to ISO Format Date
@@ -744,17 +756,22 @@ def snapshot_all():
                 lockfile_obj = open(lockfile, 'w+')  # Open Lock File, Create if Does Not Exist
                 fcntl.flock(lockfile_obj, fcntl.LOCK_EX | fcntl.LOCK_NB)  # Create Non Blocking Exclusive Flock
                 break  # Break Out of While Loop if no Errors
-            except:
+            except Exception as e:
                 time.sleep(2)
 
         # Create Student Home Directory Structure to Final Snapshot Directory If Missing
         Path(snap_student_path).mkdir(parents=True, exist_ok=True)
 
         # RSYNC Student Home to Intermediate Snapshot Directory
+        options = ['-a', '-v', '-h', '-W']
+        if include_hidden:
+            exclusions = None
+        else:
+            exclusions = ['.*']
         sysrsync.run(source=student_path,
                      destination=intsnap_student_path,
                      sync_source_contents=True,
-                     options=['-a', '-v', '-h', '-W', '--no-compress'])
+                     options=options, verbose=True, exclusions=exclusions)
 
         # Move Int Snap to Final Snap Location with New Name
         shutil.move(intsnap_student_path, snap_name_path)
