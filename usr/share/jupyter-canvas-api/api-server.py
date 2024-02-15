@@ -48,6 +48,7 @@ APIKEY = str(os.getenv('JUPYTER_API_KEY', '12345'))  # API Key Value
 HOMEDIR = str(os.getenv('JNOTE_HOME', '/mnt/efs/stat-100a-home/'))  # Home Directory Root
 SNAPSHOT_DIR = str(os.getenv('JNOTE_SNAP', '/mnt/efs/stat-100a-snap/'))  # Instructor Snapshot Directory
 INTERMEDIARY_DIR = str(os.getenv('JNOTE_INTSNAP', '/mnt/efs/stat-100a-internal/'))  # Intermediary Snapshot Directory
+all_directories = [HOMEDIR, SNAPSHOT_DIR, INTERMEDIARY_DIR]
 COURSE_CODE = str(os.getenv('JNOTE_COURSE_CODE', 'STAT100a'))  # The API Course Code
 
 UPLOAD_FOLDER = os.path.join('/tmp', 'uploads')  # Temporary Upload Folder
@@ -98,6 +99,28 @@ def slugify(value, allow_unicode=False):
         value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub(r'[^\w\s-]', '', value.lower())
     return re.sub(r'[-\s]+', '-', value).strip('-_')
+
+
+def create_directories(directories):
+    """
+    Decorators to create a directory if it doesn't exist.
+
+    Parameters:
+    - directories (list): List of the directories to be created.
+    """
+    def decorator_create_directories(func):
+        @wraps(func)
+        def wrapper_create_directories(*args, **kwargs):
+            for directory_path in directories:
+                if not os.path.exists(directory_path):
+                    try:
+                        os.makedirs(directory_path)
+                        logger.info(f"Created directory '{directory_path}'.")
+                    except OSError as e:
+                        logger.error(f"Error creating directory '{directory_path}': {e}")
+            return func(*args, **kwargs)
+        return wrapper_create_directories
+    return decorator_create_directories
 
 
 # Default Flask HTTP 401 Error
@@ -151,6 +174,7 @@ def requires_apikey(f):
 #
 @app.route('/get_snapshot_file_list', methods=['POST'])
 @requires_apikey
+@create_directories(directories=all_directories)
 def get_snapshot_file_list():
     """ Get List of Snapshot Files for the Specified Student and Snapshot. """
 
@@ -224,6 +248,7 @@ def get_snapshot_file_list():
 #
 @app.route('/get_snapshot_list', methods=['POST'])
 @requires_apikey
+@create_directories(directories=all_directories)
 def get_snapshot_list():
     """ Get List of Snapshot Directories for the Specified Student. """
 
@@ -276,6 +301,7 @@ def get_snapshot_list():
 #
 @app.route('/get_snapshot_file', methods=['POST'])
 @requires_apikey
+@create_directories(directories=all_directories)
 def get_snapshot_file():
     """ Get the Specified File from Specified Student Snapshot. """
 
@@ -368,6 +394,7 @@ def get_snapshot_file():
 #
 @app.route('/get_snapshot_zip', methods=['POST'])
 @requires_apikey
+@create_directories(directories=all_directories)
 def get_snapshot_zip():
     """ Get Zip File of Specified Student Snapshot. """
 
@@ -473,6 +500,7 @@ def get_snapshot_zip():
 #
 @app.route('/put_student_report', methods=['POST'])
 @requires_apikey
+@create_directories(directories=all_directories)
 def put_student_report():
     """ Put Specified File into Specified Student Home Directory. """
 
@@ -555,6 +583,7 @@ def put_student_report():
 #
 @app.route('/snapshot', methods=['POST'])
 @requires_apikey
+@create_directories(directories=all_directories)
 def snapshot():
     """ Create a Snapshot of the Specified Student's Home Directory with the Specified Snapshot Name. """
 
@@ -655,6 +684,7 @@ def snapshot():
 #
 @app.route('/snapshot_all', methods=['POST'])
 @requires_apikey
+@create_directories(directories=all_directories)
 def snapshot_all():
     """ Create a Snapshot of tll the Student's Home Directories with the Specified Snapshot Name. """
 
