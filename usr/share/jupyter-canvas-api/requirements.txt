@@ -1,6 +1,6 @@
 flask==2.3.3
 pathlib==1.0.1
-waitress==2.1.2
+waitress==3.0.1
 sysrsync==1.1.1
 paste==3.6.1
 
